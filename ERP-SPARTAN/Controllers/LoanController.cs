@@ -44,7 +44,7 @@ namespace ERP_SPARTAN.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Loan model , string contractDate = null)
+        public async Task<IActionResult> Create(Loan model, string contractDate = null)
         {
             //for change the contract day
             if (!string.IsNullOrEmpty(contractDate)) model.CreateAt = contractDate.ToDateTime();
@@ -137,7 +137,7 @@ namespace ERP_SPARTAN.Controllers
         public IActionResult GetAmortization(Loan model, string contractDate = null)
         {
             if (!string.IsNullOrEmpty(contractDate)) model.CreateAt = contractDate.ToDateTime();
-            
+
             return PartialView("_GetAmortizationPartial", _service.LoanService.GetAmortization(model));
         }
 
@@ -210,5 +210,9 @@ namespace ERP_SPARTAN.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetLoanByMonth() => Ok(await _service.LoanService.GetLoanByMonth(GetUserLoggedId()));
+
+        [HttpGet]
+        public async Task<IActionResult> GetBadAndGoodPayments()
+            => Ok(await _service.LoanService.GetBadAndGoodClientPayments(GetUserLoggedId()));
     }
 }

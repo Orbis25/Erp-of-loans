@@ -21,6 +21,10 @@ $(document).ready(() => {
         rowReorder: {
             selector: 'td:nth-child(2)'
         },
+        dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel'
+        ],
         responsive: true
     });
 
@@ -69,3 +73,6 @@ const printElement = (id) => {
     setTimeout(() => { newWind.close(); }, 1);
 };
 
+const print = (id) => {
+    $(`#${id}`).print({});
+};

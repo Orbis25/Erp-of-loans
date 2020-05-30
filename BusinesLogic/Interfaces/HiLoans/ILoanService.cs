@@ -25,5 +25,6 @@ namespace BusinesLogic.Interfaces.HiLoans
         Task<IEnumerable<ReclosingHistory>> GetReclosing(Guid id);
         Task<ICollection<PendingClientVM>> GetPaymentPendingClients(string createdBy);
         Task<List<MonthLoanVm>> GetLoanByMonth(string userId);
+        Task<object> GetBadAndGoodClientPayments(string userId);
     }
 }

@@ -575,7 +575,7 @@ const getReclosingHistory = (id) => {
 
 
 const amortitationTypevalue = document.getElementById("amortitationType");
- 
+
 showOrHideField(amortitationTypevalue);
 $('#amortitationType').on('change', function () {
     showOrHideField(amortitationTypevalue);
@@ -600,3 +600,12 @@ function showOrHideField(elemento) {
     }
 }
 
+const customPrint = (id, idToRemoveClass = "", classToRemove = "") => {
+    new Promise((resolve, reject) => {
+        resolve($(`#${id}`).print({ iframe: false}));
+    }).then(() => {
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    });
+};

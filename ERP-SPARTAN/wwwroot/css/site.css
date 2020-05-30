@@ -243,6 +243,30 @@ body {
 /**table*/
 .table > thead {
     background: var(--primary-color) !important;
-    color:#fff;
+    color: #fff;
 }
 /**end table*/
+
+.buttons-csv {
+    border: none;
+    width: 62px;
+    background: #343a40;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.buttons-excel {
+    border: none;
+    width: 62px;
+    background: #1d5f1d;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.buttons-print {
+    border: none;
+    width: 62px;
+    background: black;
+    color: #fff;
+    border-radius: 4px;
+}

@@ -1,4 +1,7 @@
 ﻿
+
+
+/*LINE CHARTJS*/
 fetch('/Loan/GetLoanByMonth').then((result) => result.json()).then((response) => {
     var data = response.map(x => x.quantity);
     var labels = response.map(x => x.month);
@@ -54,4 +57,42 @@ fetch('/Loan/GetLoanByMonth').then((result) => result.json()).then((response) =>
     });
     /*En home*/
 });
+/*END LINE CHARTJS*/
 
+
+
+/**PIE CHART*/
+fetch("/Loan/GetBadAndGoodPayments").then(result => result.json()).then((response) => {
+    if (response !== null) {
+        getPie(response.good, response.bad);
+    }
+});
+
+
+const getPie = (goods, bads) => {
+    const pie = document.getElementById('pie').getContext('2d');
+    const myPieChart = new Chart(pie, {
+        type: 'pie',
+        data: {
+            labels: [
+                'Solventes',
+                'Morosos'
+            ],
+            datasets: [{
+                data: [goods, bads],
+
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+
+            }]
+        }
+        //options: options
+    });
+};
+/**END PIE CHART*/

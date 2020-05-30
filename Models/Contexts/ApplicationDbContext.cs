@@ -30,6 +30,7 @@ namespace Models.Contexts
 
         #region Shared
         public DbSet<Alert> Alerts { get; set; }
+        public DbSet<Company> Companies { get; set; }
         #endregion
 
 

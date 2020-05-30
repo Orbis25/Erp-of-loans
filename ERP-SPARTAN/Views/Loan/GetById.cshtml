@@ -28,7 +28,7 @@
 </div>
 <hr />
 
-<div class="card">
+<div class="card" id="loanContainer">
     <div class="card-body">
         <div class="row">
             <div class="col-12 col-sm-12 col-md-12">
@@ -107,7 +107,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-sm btn-dark text-white" onclick="window.print()">Imprimir</button>
+                        <button type="button" class="btn btn-sm btn-dark text-white" onclick="customPrint('loanContainer','tbl-deb','stack')">Imprimir</button>
                         @if (Model.State != State.Reclosing)
                         {
                             @if (User.IsInRole(nameof(RolsAuthorization.HILoans)))
@@ -167,15 +167,18 @@
 
                                         }
                                     </select>
-                                    <button class="btn btn-sm btn-success mt-1">Filtrar</button>
+                                    <button class="btn btn-sm btn-success mt-1 mb-3">Filtrar</button>
                                 </form>
                             </div>
+
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <table class="table table-bordered mt-4 stack" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>Cuota</th>
+                                                <th>
+                                                    Cuota
+                                                </th>
                                                 <th>Fecha</th>
                                                 <th>Capital</th>
                                                 <th>Interés</th>
@@ -218,7 +221,9 @@
 
 
                                                 <tr class="@bgClass">
-                                                    <td>@item.Share</td>
+                                                    <td>
+                                                        @item.Share
+                                                    </td>
                                                     <td>@item.DateOfPaymentFormated</td>
                                                     <td>@item.AmortitationFormated</td>
                                                     <td>@item.InterestFormated</td>
@@ -277,7 +282,13 @@
                                     </table>
                                     <input type="hidden" id="amortizationTotal" value="@Math.Round(amortitation, 2)" />
                                 </div>
+
+
                             </div>
+
+
+
+
                         </div>
                     </div>
                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">

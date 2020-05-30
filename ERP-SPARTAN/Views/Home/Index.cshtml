@@ -151,6 +151,7 @@
     {
         <div class="col-12">
             <script>
+                //cargar el listado de pendientes por pagar
                 fetch('/Loan/OverdueInstallments').then(response => response.text()).then((result) => {
                     $('#pendingPay').empty();
                     $('#pendingPay').append(result);
@@ -172,6 +173,14 @@
                     <div class="card">
                         <div class="card-body text-center">
                             <canvas id="chartv1" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <h1>Clientes </h1>
+                            <canvas id="pie" width="400" height="400"></canvas>
                         </div>
                     </div>
                 </div>

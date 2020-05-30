@@ -7,6 +7,7 @@ namespace Models.ViewModels.HiLoans.Loans
     public class PendingClientVM
     {
         public Guid LoanId { get; set; }
+        public string EnterpriseName { get; set; }
         public string UserName { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }

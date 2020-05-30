@@ -500,7 +500,8 @@ namespace BusinesLogic.Services.HiLoans
                 .Include(x => x.User)
                 .Include(x => x.Debs)
                 .Include(x => x.ClientUser)
-                .ThenInclude(x => x.User)
+                .ThenInclude(x => x.Enterprise)
+                .Include(x => x.ClientUser.Enterprise)
                 .Where(x => x.UserId == createdBy
                 && x.State == State.Active
                 && x.ClientUser.State == State.Active
@@ -511,6 +512,7 @@ namespace BusinesLogic.Services.HiLoans
                     LastName = x.ClientUser.User.LastName,
                     LoanId = x.Id,
                     UserId = x.ClientUser.User.Id,
+                    EnterpriseName = x.ClientUser.Enterprise.Name,
                     UserName = x.ClientUser.User.UserName,
                     AmountLoan = x.ActualCapitalFormated,
                     TotalRate = x.Debs.Count(x => x.State == State.Active && x.DateOfPayment < DateTime.Now)
@@ -531,5 +533,23 @@ namespace BusinesLogic.Services.HiLoans
                 }).ToListAsync();
         }
 
+        public async Task<object> GetBadAndGoodClientPayments(string userId)
+        {
+            var result = _dbContext.Loans.Include(x => x.User)
+               .Include(x => x.Debs)
+               .Include(x => x.ClientUser)
+               .Where(x => x.UserId == userId && x.State == State.Active
+               && x.ClientUser.State == State.Active);
+
+            if (result.Any())
+            {
+                return new
+                {
+                    Bad = await result.CountAsync(x => x.Debs.Any(x => x.State == State.Active && x.DateOfPayment < DateTime.Now)),
+                    Good = await result.CountAsync(x => x.Debs.Any(x => x.State == State.Payment))
+                };
+            }
+            return null;
+        }
     }
 }

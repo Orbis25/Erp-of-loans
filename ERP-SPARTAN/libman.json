@@ -13,6 +13,13 @@
     {
       "library": "Chart.js@2.9.3",
       "destination": "wwwroot/lib/Chart.js/"
+    },
+    {
+      "library": "jQuery.print@1.6.0",
+      "destination": "wwwroot/lib/jQuery.print/",
+      "files": [
+        "jQuery.print.min.js"
+      ]
     }
   ]
 }
