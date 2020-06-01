@@ -26,5 +26,6 @@ namespace BusinesLogic.Interfaces.HiLoans
         Task<ICollection<PendingClientVM>> GetPaymentPendingClients(string createdBy);
         Task<List<MonthLoanVm>> GetLoanByMonth(string userId);
         Task<object> GetBadAndGoodClientPayments(string userId);
+        Task<ReceiptVM> GetReceipt(string userId, Guid debId);
     }
 }

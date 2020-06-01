@@ -28,6 +28,8 @@
 </div>
 <hr />
 
+
+
 <div class="card" id="loanContainer">
     <div class="card-body">
         <div class="row">
@@ -170,6 +172,15 @@
                                     <button class="btn btn-sm btn-success mt-1 mb-3">Filtrar</button>
                                 </form>
                             </div>
+                            <div class="col-md-8"></div>
+                            <div class="col-12">
+                                @if (ViewBag.HaveCompany != null && !ViewBag.HaveCompany)
+                                {
+                                    <div class="alert alert-info" role="alert">
+                                        <strong>IMPORTANTE:</strong> <p>SI DESEAS IMPRIMIR LOS RECIBOS DE PAGOS ES NECESARIO QUE CONFIGURES EL NOMBRE DE TU EMPRESA,RNC Y DEMAS. <br /> DIRIGETE A LA PESTAÑA DE CONFIGURACION Y COLOCA LOS DATOS DE TU EMPRESA DE MANERA CORRECTA.</p>
+                                    </div>
+                                }
+                            </div>
 
                             <div class="col-12">
                                 <div class="table-responsive">
@@ -255,6 +266,16 @@
 
                                                                 }
                                                             }
+
+                                                            if (item.State == State.Payment)
+                                                            {
+                                                                if (ViewBag.HaveCompany != null && ViewBag.HaveCompany)
+                                                                {
+                                                                    <button onclick="GetPaymentReceipt('@item.Id')" class="btn btn-sm btn-dark">
+                                                                        <i class="fa fa-receipt"></i>
+                                                                    </button>
+                                                                }
+                                                            }
                                                         }
                                                         else
                                                         {
@@ -300,6 +321,17 @@
 
     </div>
 </div>
+
+
+<!--PAYMENT BILL load with partialview-->
+<div class="container" style="display:none;">
+    <div class="card">
+        <div class="card-body p-5" style="border: 2px solid #0d355d;" id="payment-receipt">
+
+        </div>
+    </div>
+</div>
+<!--END PAYMENT BILL-->
 
 <script src="~/js/Loan/Index.js" asp-append-version="true"></script>
 <script src="~/js/Shared/httpRequest.js" asp-append-version="true"></script>

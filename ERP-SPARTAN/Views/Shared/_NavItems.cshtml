@@ -25,41 +25,40 @@
     </a>
 </li>
 
-@{switch (userRole)
-    {
-        case nameof(RolsAuthorization.Admin):
+@{
 
-            <li class="nav-item">
-                <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="ClientUser">
-                    <i class="fas fa-fw fa-users"></i>
-                    <span>Clientes</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-link-hovered " asp-action="Index" asp-controller="Rol">
-                    <i class="fas fa-fw fa-user-secret"></i>
-                    <span>Roles</span>
-                </a>
-            </li>
-            break;
-        case nameof(RolsAuthorization.ClientsUser):
-            <li class="nav-item">
-                <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="ClientUser">
-                    <i class="fas fa-fw fa-users"></i>
-                    <span>Clientes</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="Enterprise">
-                    <i class="fas fa-fw fa-building"></i>
-                    <span>Empresas</span>
-                </a>
-            </li>
-            break;
-        default:
-            <div></div>
-            break;
+    if (roles.Where(x => x.Value == nameof(RolsAuthorization.Admin)).Any())
+    {
+        <li class="nav-item">
+            <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="ClientUser">
+                <i class="fas fa-fw fa-users"></i>
+                <span>Clientes</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link nav-link-hovered " asp-action="Index" asp-controller="Rol">
+                <i class="fas fa-fw fa-user-secret"></i>
+                <span>Roles</span>
+            </a>
+        </li>
     }
+
+    if (roles.Where(x => x.Value == nameof(RolsAuthorization.ClientsUser)).Any())
+    {
+        <li class="nav-item">
+            <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="ClientUser">
+                <i class="fas fa-fw fa-users"></i>
+                <span>Clientes</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="Enterprise">
+                <i class="fas fa-fw fa-building"></i>
+                <span>Empresas</span>
+            </a>
+        </li>
+    }
+
     if (roles.Where(x => x.Value == nameof(RolsAuthorization.HiInventory)).Any())
     {
         <li class="nav-item">

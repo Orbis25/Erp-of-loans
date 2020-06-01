@@ -92,6 +92,13 @@ namespace ERP_SPARTAN.Controllers
             ViewBag.Selected = stateDeb;
             ViewBag.Action = nameof(GetById);
             ViewBag.AccessUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{nameof(Loan)}/{nameof(GetMyLoan)}";
+
+            #region Have A Company Created 
+            var existCompany = await _service.CompanyService.GetCompanyByUserId(GetUserLoggedId());
+            if (existCompany == null) ViewBag.HaveCompany = false;
+            else ViewBag.HaveCompany = true;
+            #endregion
+
             var result = await _service.LoanService.GetByIdWithRelationships(id, stateDeb);
             if (result == null) new NotFoundView();
             return View(result);
@@ -214,5 +221,14 @@ namespace ERP_SPARTAN.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBadAndGoodPayments()
             => Ok(await _service.LoanService.GetBadAndGoodClientPayments(GetUserLoggedId()));
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetPaymentReceipt(Guid debId)
+        {
+            var result = await _service.LoanService.GetReceipt(GetUserLoggedId(), debId);
+            if (result == null) return BadRequest();
+            return PartialView("_GetPaymentReceiptPartial", result);
+        }
     }
 }

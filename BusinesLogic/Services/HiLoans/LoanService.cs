@@ -551,5 +551,27 @@ namespace BusinesLogic.Services.HiLoans
             }
             return null;
         }
+
+        public async Task<ReceiptVM> GetReceipt(string userId, Guid debId)
+        {
+            var company = await _dbContext.Companies.FirstOrDefaultAsync(x => x.UserId == userId);
+            var deb = await _dbContext.Debs.Include(x => x.Loan).ThenInclude(x => x.ClientUser)
+                .ThenInclude(x => x.User).FirstOrDefaultAsync(x => x.Id == debId);
+
+            decimal amount = 0;
+            if (deb.IsExtraMount) amount = deb.ExtraMount;
+            else if (deb.AllowPayInterest) amount = deb.Interest;
+            else amount = (decimal)deb.ToPay;
+
+            return new ReceiptVM
+            {
+                CompanyName = company.Name,
+                Address = company.Address,
+                PhoneNumber = company.PhoneNumber,
+                Rnc = company.Rnc,
+                Amount = Math.Round(amount,2),
+                Deb = deb
+            };
+        }
     }
 }

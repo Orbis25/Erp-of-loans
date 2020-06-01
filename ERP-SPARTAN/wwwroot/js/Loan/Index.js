@@ -602,10 +602,28 @@ function showOrHideField(elemento) {
 
 const customPrint = (id, idToRemoveClass = "", classToRemove = "") => {
     new Promise((resolve, reject) => {
-        resolve($(`#${id}`).print({ iframe: false}));
+        resolve($(`#${id}`).print({ iframe: false }));
     }).then(() => {
         setTimeout(() => {
             location.reload();
         }, 1000);
     });
 };
+
+
+
+const GetPaymentReceipt = (debId) => {
+    const container = $('#payment-receipt');
+    Swal.showLoading();
+    fetch(`/Loan/GetPaymentReceipt?debId=${debId}`).then((response) => response.text()).then((result) => {
+        container.empty();
+        container.append(result);
+        Swal.close();
+    }).then(() => {
+
+        container.print();
+    });
+};
+
+
+
