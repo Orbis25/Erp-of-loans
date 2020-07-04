@@ -219,8 +219,7 @@ namespace ERP_SPARTAN.Controllers
         public async Task<IActionResult> GetLoanByMonth() => Ok(await _service.LoanService.GetLoanByMonth(GetUserLoggedId()));
 
         [HttpGet]
-        public async Task<IActionResult> GetBadAndGoodPayments()
-            => Ok(await _service.LoanService.GetBadAndGoodClientPayments(GetUserLoggedId()));
+        public async Task<IActionResult> GetBadAndGoodPayments() => Ok(await _service.LoanService.GetBadAndGoodClientPayments(GetUserLoggedId()));
 
         [AllowAnonymous]
         [HttpGet]
@@ -230,5 +229,39 @@ namespace ERP_SPARTAN.Controllers
             if (result == null) return BadRequest();
             return PartialView("_GetPaymentReceiptPartial", result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Report()
+        {
+            ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == GetUserLoggedId());
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReports(FilterOfReportVM model)
+        {
+            ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == GetUserLoggedId());
+            if (!string.IsNullOrEmpty(model.StartDate) && !string.IsNullOrEmpty(model.EndDate))
+            {
+                if (model.Enterprise != null)
+                {
+                    model.Results = await _service.LoanService
+                        .GetReportOfLoot(x => x.ClientUser.EnterpriseId == model.Enterprise
+                        && x.UserId == GetUserLoggedId()
+                        && (x.CreateAt >= model.StartDate.ToDateTime() && x.CreateAt <= model.EndDate.ToDateTime()));
+
+                    return View(nameof(Report), model);
+                }
+
+                model.Results = await _service.LoanService
+                    .GetReportOfLoot(x => x.UserId == GetUserLoggedId()
+                        && (x.CreateAt >= model.StartDate.ToDateTime() && x.CreateAt <= model.EndDate.ToDateTime()));
+
+                return View(nameof(Report), model);
+            }
+            BasicNotification("Rango de fecha invalido, intente nuevamente", NotificationType.error, "Error");
+            return RedirectToAction(nameof(Report));
+        }
+
     }
 }

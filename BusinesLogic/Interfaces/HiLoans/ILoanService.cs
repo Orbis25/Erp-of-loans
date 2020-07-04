@@ -18,7 +18,7 @@ namespace BusinesLogic.Interfaces.HiLoans
         Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null);
         Task<Loan> GetByIdWithRelationships(Guid id, State state);
         Task<bool> SoftRemove(Guid id);
-        Task<bool> PaymentDeb(Guid id, Guid idLoan, decimal extraMount,bool InterestOnly);
+        Task<bool> PaymentDeb(Guid id, Guid idLoan, decimal extraMount, bool InterestOnly);
         IEnumerable<Deb> GetAmortization(Loan model);
         Task<bool> AddReclosing(Loan model);
         int getShares(Loan model);
@@ -27,5 +27,6 @@ namespace BusinesLogic.Interfaces.HiLoans
         Task<List<MonthLoanVm>> GetLoanByMonth(string userId);
         Task<object> GetBadAndGoodClientPayments(string userId);
         Task<ReceiptVM> GetReceipt(string userId, Guid debId);
+        Task<ICollection<ReportOfLootVM>> GetReportOfLoot(Expression<Func<Loan, bool>> expression);
     }
 }

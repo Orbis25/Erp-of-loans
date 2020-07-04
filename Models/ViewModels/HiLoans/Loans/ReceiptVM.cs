@@ -13,5 +13,17 @@ namespace Models.ViewModels.HiLoans.Loans
         public string PhoneNumber { get; set; }
         public Deb Deb { get; set; }
         public decimal Amount { get; set; }
+        public decimal Interes { get; set; }
+        public decimal ExtraAmount { get; set; }
+        public decimal ToPay { get; set; }
+        public decimal ActualCapital { get; set; }
+
+
+
+        public bool OnlyInteres { get; set; } = false;
+        public bool IsExtraAmount { get; set; } = false;
+        public bool IsNormal => (!OnlyInteres && !IsExtraAmount);
+
+
     }
 }

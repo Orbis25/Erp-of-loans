@@ -559,8 +559,18 @@ namespace BusinesLogic.Services.HiLoans
                 .ThenInclude(x => x.User).FirstOrDefaultAsync(x => x.Id == debId);
 
             decimal amount = 0;
-            if (deb.IsExtraMount) amount = deb.ExtraMount;
-            else if (deb.AllowPayInterest) amount = deb.Interest;
+            var isExtraMount = false;
+            var isInteres = false;
+            if (deb.IsExtraMount)
+            {
+                amount = deb.ExtraMount + (decimal)deb.ToPay;
+                isExtraMount = true;
+            }
+            else if (deb.AllowPayInterest)
+            {
+                amount = deb.Interest;
+                isInteres = true;
+            }
             else amount = (decimal)deb.ToPay;
 
             return new ReceiptVM
@@ -569,9 +579,28 @@ namespace BusinesLogic.Services.HiLoans
                 Address = company.Address,
                 PhoneNumber = company.PhoneNumber,
                 Rnc = company.Rnc,
-                Amount = Math.Round(amount,2),
+                Amount = Math.Round(amount, 2),
+                ExtraAmount = Math.Round(deb.ExtraMount, 2),
+                Interes = Math.Round(deb.Interest, 2),
+                IsExtraAmount = isExtraMount,
+                OnlyInteres = isInteres,
+                ActualCapital = deb.Loan.ActualCapital,
+                ToPay = (decimal)Math.Round(deb.ToPay, 2),
                 Deb = deb
             };
         }
+
+        public async Task<ICollection<ReportOfLootVM>> GetReportOfLoot(Expression<Func<Loan, bool>> expression)
+            => await Filter(expression)
+                .Include(x => x.ClientUser)
+                .ThenInclude(x => x.Enterprise)
+                .Include(x => x.Debs)
+                .Select(x => new ReportOfLootVM
+                {
+                    CompanyName = x.ClientUser.Enterprise.Name,
+                    Date = x.CreateAt,
+                    Loot = x.Debs.Sum(_ => _.Interest)
+                }).ToListAsync();
+
     }
 }

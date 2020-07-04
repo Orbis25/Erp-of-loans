@@ -40,6 +40,15 @@ $(document).ready(() => {
 
     $('.input-date').datepicker('setDate', new Date());
 
+    $('.input-date-no-default').datepicker({
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        endDate: new Date()
+    });
+
+    $('.input-date-no-default').keypress((e) => false);
+
 });
 
 

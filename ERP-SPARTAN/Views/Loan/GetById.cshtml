@@ -267,7 +267,7 @@
                                                                 }
                                                             }
 
-                                                            if (item.State == State.Payment)
+                                                            if (item.State == State.Payment || item.AllowPayInterest)
                                                             {
                                                                 if (ViewBag.HaveCompany != null && ViewBag.HaveCompany)
                                                                 {

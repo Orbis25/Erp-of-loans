@@ -60,39 +60,43 @@ fetch('/Loan/GetLoanByMonth').then((result) => result.json()).then((response) =>
 /*END LINE CHARTJS*/
 
 
+/*Calcultorjs*/
 
-/**PIE CHART*/
-fetch("/Loan/GetBadAndGoodPayments").then(result => result.json()).then((response) => {
-    if (response !== null) {
-        getPie(response.good, response.bad);
+const changeElementsInputs = () => {
+    if (Number($('#amortitationType').val()) === 0) {
+        $('#container-amountRate').show();
+        $('#container-numberRate').hide();
+    } else {
+        $('#container-amountRate').hide();
+        $('#container-numberRate').show();
+
     }
-});
+
+};
+
+const getCalculatorResult = () => {
+    const inputs = $('#calculator-form').find(":input");
+    const amortizationType = inputs[0].value;
+    const initCapital = inputs[1].value;
+    const typeOfTasa = inputs[2].value;
+    const interest = inputs[3].value;
+    const paymentModality = inputs[5].value;
+
+    const amountDeb = inputs[4].value;
 
 
-const getPie = (goods, bads) => {
-    const pie = document.getElementById('pie').getContext('2d');
-    const myPieChart = new Chart(pie, {
-        type: 'pie',
-        data: {
-            labels: [
-                'Solventes',
-                'Morosos'
-            ],
-            datasets: [{
-                data: [goods, bads],
+    const shares = inputs[6].value;
 
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)'
-                ],
 
-            }]
-        }
-        //options: options
+
+    const querystr = `?InitialCapital=${initCapital}&ActualCapital=${initCapital}&Interest=${interest}
+                        &Shares=${shares}&RateType=${typeOfTasa}&AmortitationType=${amortizationType}
+                         &PaymentModality=${paymentModality}&AmountDeb=${amountDeb}&contractDate=${new Date()}&`;
+    fetch(`/Loan/GetAmortization${querystr}"`).then(result => result.text()).then((response) => {
+        $('#calculator-result').empty();
+        $('#calculator-result').html(response);
     });
 };
-/**END PIE CHART*/
+
+
+/*end calculatorjs*/

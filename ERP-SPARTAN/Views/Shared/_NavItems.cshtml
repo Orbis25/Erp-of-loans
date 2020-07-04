@@ -93,6 +93,80 @@
             </a>
         </li>
         <li class="nav-item">
+            <a style="cursor:pointer;" class="nav-link nav-link-hovered" data-toggle="modal" data-target=".bd-example-modal-lg">
+                <i class="fa fa-calculator"></i>
+                <span>Calculadora</span>
+            </a>
+            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col">
+                                    <form id="calculator-form" onsubmit="return false;">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Tipo de amortización</label>
+                                                    <select onchange="changeElementsInputs()" asp-items="Html.GetEnumSelectList<Models.Enums.HiAccounting.AmortitationType>()" class="form-control form-control-sm"></select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label">Capital inicial</label>
+                                                    <input min="1" class="form-control  form-control-sm decimal" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>Tipo de tasa</label>
+                                                    <select class="custom-select form-control form-control-sm" asp-items="Html.GetEnumSelectList<RateType>()"></select>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-group">
+                                                    <label class="control-label">Tasa de interes %</label>
+                                                    <input type="number" class="form-control  form-control-sm" step="any" />
+                                                </div>
+                                                <div class="form-group" id="container-amountRate">
+                                                    <label>Monto cuota</label>
+                                                    <input class="form-control  form-control-sm" min="0" value="0" type="number" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label">Modalidad de pago</label>
+                                                    <select asp-items="Html.GetEnumSelectList<PaymentModality>()" class="form-control  form-control-sm"></select>
+                                                </div>
+                                                <div class="form-group" style="display:none;" id="container-numberRate">
+                                                    <label>No. Cuotas</label>
+                                                    <input class="form-control  form-control-sm" min="0" value="0" type="number" />
+                                                </div>
+                                            </div>
+                                            <div class="col-12">
+                                                <button onclick="getCalculatorResult()" class="btn btn-sm btn-block btn-info">Calcular</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <hr />
+                                <div class="col-12" id="calculator-result">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">CERRAR</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </li>
+        <li class="nav-item">
+            <a class="nav-link nav-link-hovered" style="cursor:pointer;" asp-action="Report" asp-controller="Loan" >
+                <i class="fa fa-chart-line"></i>
+                <span>Reportes</span>
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link nav-link-hovered" asp-action="Index" asp-controller="Company">
                 <i class="fa fa-hotel"></i>
                 <span>Configuración</span>
@@ -100,4 +174,4 @@
         </li>
     }
 }
-
+<script src="~/js/Home/index.js" asp-append-version="true"></script>

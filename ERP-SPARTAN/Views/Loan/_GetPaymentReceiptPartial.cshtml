@@ -27,14 +27,32 @@
         <label><strong>MONTO :</strong></label><input value="$@Model.Amount" class="decimal" style="width:30%; border-top:none;border-left:none;border-right:none;" />
 
     </div>
-    <div class="col-4 mt-5">
-        <p class="text-muted">TOTAL RECIBO: $<span class="decimal">@Model.Amount</span></p>
+    <div class="col-8 mt-5">
+        <p class="text-muted">
+            TOTAL RECIBO: $<span class="decimal">@Model.Amount</span> <span class="ml-5"> INTERESS: $<span class="decimal">@Model.Interes</span></span>
+            <span class="ml-5"> MONTO EXTRA: $<span class="decimal">@Model.ExtraAmount</span></span>
+            @if (Model.IsExtraAmount)
+            {
+                <span class="ml-5"> MONTO CUOTA: $<span class="decimal">@Model.ToPay</span></span>
+            }
+            <br />
+            <span class=""><strong>CAPITAL RESTANTE: $<span class="decimal">@Model.ActualCapital</span></strong></span>
+        </p>
+        <p class="text-muted"></p>
+
     </div>
-    <div class="col-4">
-    </div>
+
     <div class="col-4 mt-5">
         <input style="width:100%; border-top:none;border-left:none;border-right:none;" />
         <p class="text-center"><u>FIRMA RESPONSABLE</u></p>
+    </div>
+    <div class="col-12">
+        <label>SOLO INTERES</label>
+        <input type="checkbox" name="name" asp-for="OnlyInteres" />
+        <label class="ml-3">MONTO EXTRA</label>
+        <input type="checkbox" name="name" asp-for="IsExtraAmount" />
+        <label class="ml-3">PAGO NORMAL</label>
+        <input type="checkbox" name="name" asp-for="IsNormal" />
     </div>
 </div>
 <script>

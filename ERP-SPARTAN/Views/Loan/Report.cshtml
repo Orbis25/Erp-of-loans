@@ -1,0 +1,76 @@
+﻿@model FilterOfReportVM
+
+<div class="row">
+    <div class="col-12 col-sm-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-4">
+                        <h3>Reportes</h3>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                        <form asp-action="GetReports" method="get">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="fecha de inicio" class="form-control input-date-no-default" asp-for="StartDate" />
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                    <div class="form-group">
+                                        <input type="text" placeholder="fecha de fin" class="form-control input-date-no-default" asp-for="EndDate" />
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                    <div class="form-group">
+                                        <select class="form-control" asp-for="Enterprise" asp-items="ViewBag.Enterprises">
+                                            <option selected>SELECCIONE LA EMPRESA</option>
+                                            <option>TODAS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-block btn-primary">buscar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                @if (Model != null && Model.Results.Any())
+                {
+                    <h1>GANANCIA TOTAL : $ <span class="decimal">@Model.Results.Sum(x => x.Loot)</span></h1>
+                    <table class="table data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Fecha</th>
+                                <th scope="col">Empresa</th>
+                                <th scope="col">Ganancia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model.Results)
+                            {
+                                <tr>
+                                    <th scope="row">@item.Date.ToShortDateString()</th>
+                                    <td>@item.CompanyName</td>
+                                    <td class="decimal">@item.Loot</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_NotificationPartial" />
