@@ -598,7 +598,7 @@ namespace BusinesLogic.Services.HiLoans
                 .Select(x => new ReportOfLootVM
                 {
                     CompanyName = x.ClientUser.Enterprise.Name,
-                    Date = x.CreateAt,
+                    Date = x.CreatedAtStr,
                     Loot = x.Debs.Sum(_ => _.Interest)
                 }).ToListAsync();
 

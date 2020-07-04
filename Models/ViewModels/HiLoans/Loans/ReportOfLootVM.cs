@@ -14,7 +14,7 @@ namespace Models.ViewModels.HiLoans.Loans
 
     public class ReportOfLootVM
     {
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         public decimal Loot { get; set; }
         public string CompanyName { get; set; }
     }
