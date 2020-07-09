@@ -36,7 +36,7 @@ namespace BusinesLogic.Services.HiLoans
             return result;
         }
 
-        public async Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null)
+        public async Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null, Guid? bankId = null)
         {
             var result = Filter(x => x.UserId == userId).Include(x => x.Debs)
                 .Include(x => x.ClientUser.Enterprise)
@@ -45,10 +45,8 @@ namespace BusinesLogic.Services.HiLoans
                 .ThenInclude(x => x.User)
             .AsQueryable();
 
-            if (idEnterprise != null)
-            {
-                result = result.Where(x => x.ClientUser.EnterpriseId == idEnterprise);
-            }
+            if (idEnterprise != null) result = result.Where(x => x.ClientUser.EnterpriseId == idEnterprise);
+            if (bankId != null) result = result.Where(x => x.ClientUser.BankId == bankId);
 
             return await result.OrderByDescending(x => x.CreateAt).ToListAsync();
         }
@@ -584,23 +582,64 @@ namespace BusinesLogic.Services.HiLoans
                 Interes = Math.Round(deb.Interest, 2),
                 IsExtraAmount = isExtraMount,
                 OnlyInteres = isInteres,
-                ActualCapital = deb.Loan.ActualCapital,
+                ActualCapital = Math.Round(deb.Amount - (decimal)deb.Amortitation, 2),
                 ToPay = (decimal)Math.Round(deb.ToPay, 2),
                 Deb = deb
             };
         }
 
-        public async Task<ICollection<ReportOfLootVM>> GetReportOfLoot(Expression<Func<Loan, bool>> expression)
-            => await Filter(expression)
-                .Include(x => x.ClientUser)
-                .ThenInclude(x => x.Enterprise)
-                .Include(x => x.Debs)
-                .Select(x => new ReportOfLootVM
-                {
-                    CompanyName = x.ClientUser.Enterprise.Name,
-                    Date = x.CreatedAtStr,
-                    Loot = x.Debs.Sum(_ => _.Interest)
-                }).ToListAsync();
+        public async Task<ICollection<ReportOfLootVM>> GetReportOfLoot(string userId, FilterOfReportVM model)
+        {
+            var results = Filter(x => x.UserId == userId
 
+              && x.State != State.Reclosing
+             && x.State == State.Active &&
+
+            x.Debs.Where(_ => _.State == model.DebState).Any())
+                .Include(x => x.ClientUser);
+
+            if (model.Bank != null)
+                results = results.ThenInclude(x => x.Bank).Where(x => x.ClientUser.BankId == model.Bank).Include(x => x.ClientUser);
+            if (model.Enterprise != null)
+                results = results.ThenInclude(x => x.Bank).Where(x => x.ClientUser.EnterpriseId == model.Enterprise).Include(x => x.ClientUser);
+
+            return await results.Select(x => new ReportOfLootVM
+            {
+                CompanyName = x.ClientUser.Enterprise.Name,
+                Date = x.CreatedAtStr,
+                Loot = x.Debs.Where(x => x.State == model.DebState).Sum(_ => _.Interest),
+                BankName = x.ClientUser.Bank.Name,
+
+            }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<BankResume>> GetBankResumes(string userId, FilterOfReportVM model)
+        {
+            var results = Filter(x => x.UserId == userId
+            && x.State != State.Reclosing
+            && x.State == State.Active &&
+
+            x.Debs.Where(_ => _.State == model.DebState).Any())
+                .Include(x => x.ClientUser);
+
+            if (model.Bank != null)
+                results = results.ThenInclude(x => x.Bank).Where(x => x.ClientUser.BankId == model.Bank).Include(x => x.ClientUser);
+            if (model.Enterprise != null)
+                results = results.ThenInclude(x => x.Bank).Where(x => x.ClientUser.EnterpriseId == model.Enterprise).Include(x => x.ClientUser);
+
+            var result = await results.AsNoTracking().Select(x =>
+             new BankResume
+             {
+                 Amount = x.Debs.Where(_ => _.State == model.DebState).Sum(x => x.Interest),
+                 BankName = x.ClientUser.Bank.Name
+             }).ToListAsync();
+
+            return result.GroupBy(x => x.BankName, (t, s) => new BankResume
+            {
+                Amount = s.Select(x => x.Amount).Sum(x => x),
+                BankName = t
+            });
+
+        }
     }
 }

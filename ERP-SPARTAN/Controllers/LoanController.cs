@@ -23,11 +23,13 @@ namespace ERP_SPARTAN.Controllers
         public LoanController(IUnitOfWork unitOfWork) => _service = unitOfWork;
 
         [HttpGet]
-        public async Task<IActionResult> Index(Guid? idEnterprise = null)
+        public async Task<IActionResult> Index(FilterLoanVM model)
         {
             var userId = GetUserLoggedId();
             ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == userId);
-            return View(await _service.LoanService.GetAllWithRelationShip(userId, idEnterprise));
+            ViewBag.Banks = await _service.BankService.GetListItem();
+            model.Results = await _service.LoanService.GetAllWithRelationShip(userId, model.EnterpriseId, model.BankId);
+            return View(model);
         }
 
         [HttpGet]
@@ -234,6 +236,8 @@ namespace ERP_SPARTAN.Controllers
         public async Task<IActionResult> Report()
         {
             ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == GetUserLoggedId());
+            ViewBag.Banks = await _service.BankService.GetListItem();
+
             return View();
         }
 
@@ -241,22 +245,15 @@ namespace ERP_SPARTAN.Controllers
         public async Task<IActionResult> GetReports(FilterOfReportVM model)
         {
             ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == GetUserLoggedId());
+            ViewBag.Banks = await _service.BankService.GetListItem();
+
             if (!string.IsNullOrEmpty(model.StartDate) && !string.IsNullOrEmpty(model.EndDate))
             {
-                if (model.Enterprise != null)
+                model.Results = await _service.LoanService.GetReportOfLoot(GetUserLoggedId(),model);
+                if (model.Results.Any())
                 {
-                    model.Results = await _service.LoanService
-                        .GetReportOfLoot(x => x.ClientUser.EnterpriseId == model.Enterprise
-                        && x.UserId == GetUserLoggedId()
-                        && (x.CreateAt >= model.StartDate.ToDateTime() && x.CreateAt <= model.EndDate.ToDateTime()));
-
-                    return View(nameof(Report), model);
+                    model.Banks = await _service.LoanService.GetBankResumes(GetUserLoggedId(), model);
                 }
-
-                model.Results = await _service.LoanService
-                    .GetReportOfLoot(x => x.UserId == GetUserLoggedId()
-                        && (x.CreateAt >= model.StartDate.ToDateTime() && x.CreateAt <= model.EndDate.ToDateTime()));
-
                 return View(nameof(Report), model);
             }
             BasicNotification("Rango de fecha invalido, intente nuevamente", NotificationType.error, "Error");

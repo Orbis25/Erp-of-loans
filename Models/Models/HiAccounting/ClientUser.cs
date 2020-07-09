@@ -1,4 +1,5 @@
 ﻿using Models.Models.Accounting;
+using Models.Models.HiLoans;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -20,5 +21,7 @@ namespace Models.Models
         public Enterprise Enterprise { get; set; }
         public string IdentificationCard { get; set; }
         public string Address { get; set; }
+        public Guid? BankId { get; set; }
+        public Bank Bank { get; set; }
     }
 }

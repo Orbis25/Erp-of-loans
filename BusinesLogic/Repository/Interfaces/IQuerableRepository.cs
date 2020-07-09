@@ -12,5 +12,6 @@ namespace BusinesLogic.Repository.Interfaces
         IQueryable<TEntity> GetAll();
         Task<TEntity> GetById(Guid id);
         IQueryable<TEntity> Filter(Expression<Func<TEntity, bool>> expression);
+        Task<IEnumerable<TEntity>> GetList(Expression<Func<TEntity,bool>> expression = null);
     }
 }

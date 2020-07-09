@@ -46,6 +46,7 @@ namespace ERP_SPARTAN.Controllers
         public async Task<IActionResult> Create()
         {
             var userId = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            ViewBag.Banks = await _service.BankService.GetListItem();
             return View(new CreateUserViewModel { Enterprises = await _service.EnterpriseService.GetList(userId) });
         }
 
@@ -75,7 +76,8 @@ namespace ERP_SPARTAN.Controllers
                         CreatedBy = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value,
                         IdentificationCard = client.IdentificationCard,
                         EnterpriseId = client.EnterpriseId,
-                        Address = client.Address
+                        Address = client.Address,
+                        BankId  = client.BankId
                     }))
                     {
                         var resultRol = await _userManager.AddToRoleAsync(user, client.Rol.ToString());
@@ -86,6 +88,7 @@ namespace ERP_SPARTAN.Controllers
                         }
                     }
                     BasicNotification("Ocurrió un error, no se pudo guardar el cliente", NotificationType.error);
+                    ViewBag.Banks = await _service.BankService.GetListItem();
                     return View(client);
                 }
                 else
@@ -93,7 +96,7 @@ namespace ERP_SPARTAN.Controllers
                     ModelState.AddModelError(nameof(client.Email), "Error ya existe un cliente con el correo " + client.Email);
                 }
             }
-
+            ViewBag.Banks = await _service.BankService.GetListItem();
             return View(client);
         }
 
@@ -102,6 +105,7 @@ namespace ERP_SPARTAN.Controllers
         [HttpGet]
         public async Task<IActionResult> GetById(Guid id)
         {
+            ViewBag.Banks = await _service.BankService.GetListItem();
             var model = await _service.ClientUserService.GetByIdWithRelationships(id);
             if (model != null) return View(model);
             return new NotFoundView();
@@ -111,6 +115,7 @@ namespace ERP_SPARTAN.Controllers
         [HttpPost]
         public async Task<IActionResult> Update(ClientUser model)
         {
+            ViewBag.Banks = await _service.BankService.GetListItem();
             if (ModelState.IsValid)
             {
                 if (await _service.UserService.Update(model.User))

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Models.Models.HiAccounting.Loan>
+﻿@model FilterLoanVM
 
 
 
@@ -30,11 +30,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="col-md-6 col-12 mb-3">
-                    <label class="col-form-label">Empresas</label>
                     <form class="form-group form-inline" asp-action="Index" method="get">
                         <div class="form-group">
-                            <select class="form-control m-1" name="idEnterprise" asp-items="ViewBag.Enterprises">
-                                <option value="" selected>Todas las empresas</option>
+                            <select class="form-control m-1" id="idEnterprise" asp-for="EnterpriseId" asp-items="ViewBag.Enterprises">
+                                <option>Todas las empresas</option>
+                            </select>
+                            <select class="form-control m-1" id="idBank" asp-for="BankId" asp-items="ViewBag.Banks">
                             </select>
                             <button class="btn btn-primary m-1"><i class="fa fa-search"></i></button>
                         </div>
@@ -73,7 +74,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model.Where(x => x.ActualCapital > 0 && x.State == State.Active))
+                                        @foreach (var item in Model.Results.Where(x => x.ActualCapital > 0 && x.State == State.Active))
                                         {
                                             <tr>
                                                 <td>
@@ -113,7 +114,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.Where(x => x.ActualCapital <= 0))
+                                    @foreach (var item in Model.Results.Where(x => x.ActualCapital <= 0))
                                     {
                                         <tr>
                                             <td>
@@ -151,7 +152,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var item in Model.Where(x => x.State == State.Reclosing))
+                                    @foreach (var item in Model.Results.Where(x => x.State == State.Reclosing))
                                     {
                                         <tr>
                                             <td>
@@ -179,5 +180,6 @@
         </div>
     </div>
 </div>
+
 
 <partial name="_NotificationPartial" />

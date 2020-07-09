@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Models.Models.HiLoans.Bank>
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h1>BANCOS</h1> <a asp-action="Create" class="btn-primary btn btn-sm">Nuevo</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <table class="table data-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nombres</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Name</td>
+                                <td><a asp-action="Remove" asp-route-id="@item.Id"class="text-danger">Eliminar</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<partial name="_NotificationPartial" />

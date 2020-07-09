@@ -41,6 +41,12 @@
                 <span>Roles</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link nav-link-hovered " asp-action="Index" asp-controller="Bank">
+                <i class="fas fa-fw fa-hotel"></i>
+                <span>Bancos</span>
+            </a>
+        </li>
     }
 
     if (roles.Where(x => x.Value == nameof(RolsAuthorization.ClientsUser)).Any())
@@ -161,7 +167,7 @@
 
         </li>
         <li class="nav-item">
-            <a class="nav-link nav-link-hovered" style="cursor:pointer;" asp-action="Report" asp-controller="Loan" >
+            <a class="nav-link nav-link-hovered" style="cursor:pointer;" asp-action="Report" asp-controller="Loan">
                 <i class="fa fa-chart-line"></i>
                 <span>Reportes</span>
             </a>

@@ -32,6 +32,7 @@ namespace BusinesLogic.UnitOfWork
         private AlertService _alertService;
         private RoleService _roleService;
         private CompanyService _companyService;
+        private BankService _bankService;
 
         public UnitOfWork(ApplicationDbContext context) => _context = context;
 
@@ -56,6 +57,8 @@ namespace BusinesLogic.UnitOfWork
         public IRoleService RoleService => _roleService ?? (_roleService = new RoleService(_context));
 
         public ICompanyService CompanyService => _companyService ?? (_companyService = new CompanyService(_context));
+
+        public IBankService BankService => _bankService ?? (_bankService = new BankService(_context));
 
         async Task IUnitOfWork.Commit() => await _context.SaveChangesAsync();
         #endregion

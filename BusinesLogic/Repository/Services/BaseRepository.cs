@@ -20,11 +20,18 @@ namespace BusinesLogic.Repository.Services
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
-        public IQueryable<TEntity> Filter(Expression<Func<TEntity, bool>> expression) => _dbContext.Set<TEntity>().Where(expression);
+        public IQueryable<TEntity> Filter(Expression<Func<TEntity, bool>> expression = null)
+        {
+            if (expression == null) return GetAll();
+            return _dbContext.Set<TEntity>().Where(expression); 
+        }
 
         public IQueryable<TEntity> GetAll() => _dbContext.Set<TEntity>().AsQueryable();
 
         public async Task<TEntity> GetById(Guid id) => await _dbContext.Set<TEntity>().FindAsync(id);
+
+        public async Task<IEnumerable<TEntity>> GetList(Expression<Func<TEntity, bool>> expression = null)
+            => await Filter(expression).ToListAsync();
 
         public async Task<bool> Remove(TEntity entity)
         {

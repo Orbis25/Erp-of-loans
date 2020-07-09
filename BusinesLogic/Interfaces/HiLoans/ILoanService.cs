@@ -15,7 +15,7 @@ namespace BusinesLogic.Interfaces.HiLoans
 {
     public interface ILoanService : IBaseRepository<Loan>
     {
-        Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null);
+        Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null, Guid? BankId = null);
         Task<Loan> GetByIdWithRelationships(Guid id, State state);
         Task<bool> SoftRemove(Guid id);
         Task<bool> PaymentDeb(Guid id, Guid idLoan, decimal extraMount, bool InterestOnly);
@@ -27,6 +27,7 @@ namespace BusinesLogic.Interfaces.HiLoans
         Task<List<MonthLoanVm>> GetLoanByMonth(string userId);
         Task<object> GetBadAndGoodClientPayments(string userId);
         Task<ReceiptVM> GetReceipt(string userId, Guid debId);
-        Task<ICollection<ReportOfLootVM>> GetReportOfLoot(Expression<Func<Loan, bool>> expression);
+        Task<ICollection<ReportOfLootVM>> GetReportOfLoot(string userId, FilterOfReportVM model);
+        Task<IEnumerable<BankResume>> GetBankResumes(string userId, FilterOfReportVM model);
     }
 }

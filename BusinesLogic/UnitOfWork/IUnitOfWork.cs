@@ -24,6 +24,7 @@ namespace BusinesLogic.UnitOfWork
         IAlertService AlertService { get; }
         IRoleService RoleService { get; }
         ICompanyService CompanyService { get; }
+        IBankService BankService { get; }
         Task Commit();
     }
 }

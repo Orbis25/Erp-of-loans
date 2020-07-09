@@ -65,6 +65,7 @@ namespace BusinesLogic.Services
             model.IdentificationCard = entity.IdentificationCard;
             model.State = entity.State;
             model.Address = entity.Address;
+            model.BankId = entity.BankId;
             _dbContext.Update(model);
             return await _dbContext.SaveChangesAsync() > 0;
         }

@@ -26,6 +26,8 @@ namespace Models.Contexts
             builder.Entity<Movement>().HasQueryFilter(x => x.State != Enums.State.Removed && x.State != Enums.State.Payment);
             builder.Entity<Loan>().HasQueryFilter(x => x.State != Enums.State.Removed);
             builder.Entity<Deb>().HasQueryFilter(x => x.State != Enums.State.Removed);
+            builder.Entity<Bank>().HasQueryFilter(x => x.State != Enums.State.Removed);
+
         }
 
         #region Shared
@@ -43,6 +45,7 @@ namespace Models.Contexts
         public DbSet<Loan> Loans { get; set; }
         public DbSet<Deb> Debs { get; set; }
         public DbSet<ReclosingHistory> ReclosingHistories { get; set; }
+        public DbSet<Bank> Banks { get; set; }
         #endregion
 
 

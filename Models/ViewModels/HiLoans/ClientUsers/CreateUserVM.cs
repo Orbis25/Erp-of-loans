@@ -17,5 +17,7 @@ namespace Models.ViewModels.ClientUsers
         public string IdentificationCard { get; set; }
         [Display(Name = "Dirección")]
         public string Address { get; set; }
+        [Display(Name = "Institución financiera de cobro")]
+        public Guid? BankId { get; set; } = null;
     }
 }
