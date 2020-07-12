@@ -117,6 +117,11 @@
                                 <button class="btn btn-sm btn-danger" onclick="ShowSweetConfirmRemoveDialog('@Model.Id','/Loan','Remove','Esta operación no puede ser revertida','Esta seguro?','/Loan/Index',)">Cancelar prestamo</button>
                                 <a asp-action="Reclosing" asp-route-Id="@Model.Id" class="btn btn-sm btn-dark">Reenganche</a>
                                 <button type="button" class="btn btn-sm btn-dark text-white" onclick="getAccess('@ViewBag.AccessUrl','@Model.Id')"> Conceder Acceso</button>
+
+                                <button onclick="GetHistoryPaymentsLoan('@Model.Id')" class="btn btn-sm btn-dark">
+                                    <i class="fas fa-receipt"></i>
+                                     Historial de pagos
+                                </button>
                             }
                         }
                         @if (Model.State == State.Reclosing)
@@ -272,7 +277,7 @@
                                                                 if (ViewBag.HaveCompany != null && ViewBag.HaveCompany)
                                                                 {
                                                                     <button onclick="GetPaymentReceipt('@item.Id')" class="btn btn-sm btn-dark">
-                                                                        <i class="fa fa-receipt"></i>
+                                                                        <i class="fas fa-print"></i>
                                                                     </button>
                                                                 }
                                                             }

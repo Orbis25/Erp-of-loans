@@ -47,6 +47,7 @@ namespace Models.Models.HiAccounting
         public ClientUser ClientUser { get; set; }
         public virtual IEnumerable<Deb> Debs { get; set; }
         public virtual IEnumerable<ReclosingHistory> ReclosingHistories { get; set; }
+        public virtual IEnumerable<HistoryPaymentsLoan> HistoryPaymentsLoans { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal AmountDeb { get; set; }
 

@@ -27,6 +27,8 @@ namespace BusinesLogic.Interfaces.HiLoans
         Task<List<MonthLoanVm>> GetLoanByMonth(string userId);
         Task<object> GetBadAndGoodClientPayments(string userId);
         Task<ReceiptVM> GetReceipt(string userId, Guid debId);
+        Task<Loan> GetHistoryPaymentsLoan(Guid Loanid);
+        
         Task<ICollection<ReportOfLootVM>> GetReportOfLoot(string userId, FilterOfReportVM model);
         Task<IEnumerable<BankResume>> GetBankResumes(string userId, FilterOfReportVM model);
     }

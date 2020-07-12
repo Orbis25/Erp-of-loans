@@ -231,6 +231,14 @@ namespace ERP_SPARTAN.Controllers
             if (result == null) return BadRequest();
             return PartialView("_GetPaymentReceiptPartial", result);
         }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetHistoryPaymentsLoan(Guid loanId)
+        {
+            var result = await _service.LoanService.GetHistoryPaymentsLoan(loanId);
+            if (result == null) return BadRequest();
+            return PartialView("_GetHistoryPaymentsLoan", result);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Report()

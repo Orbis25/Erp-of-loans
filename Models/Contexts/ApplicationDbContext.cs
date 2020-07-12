@@ -46,6 +46,8 @@ namespace Models.Contexts
         public DbSet<Deb> Debs { get; set; }
         public DbSet<ReclosingHistory> ReclosingHistories { get; set; }
         public DbSet<Bank> Banks { get; set; }
+        public DbSet<HistoryPaymentsLoan> HistoryPaymentsLoan { get; set; }
+        
         #endregion
 
 

@@ -556,6 +556,7 @@ const reenganch = (id) => {
     Swal.fire({
         title: "Nuevo Reenganche",
         icon: 'info',
+      
         showCancelButton: false,
         showConfirmButton: false,
         confirmButtonColor: '#3085d6',
@@ -625,5 +626,22 @@ const GetPaymentReceipt = (debId) => {
     });
 };
 
+
+const GetHistoryPaymentsLoan = (loanId) => {
+    const container = $('#payment-receipt');
+    Swal.showLoading();
+    fetch(`/Loan/GetHistoryPaymentsLoan?loanId=${loanId}`).then((response) => response.text()).then((result) => {
+        Swal.close();
+        Swal.fire({
+            showCancelButton: false,
+            width: 1000,
+            showConfirmButton: false,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Confirmar',
+            html: result
+        });
+    })
+};
 
 
