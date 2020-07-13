@@ -803,7 +803,7 @@ namespace ERP_SPARTAN.Data.Migrations
             modelBuilder.Entity("Models.Models.HiLoans.HistoryPaymentsLoan", b =>
                 {
                     b.HasOne("Models.Models.HiAccounting.Loan", "Loan")
-                        .WithMany("HistoryPaymentsLoans")
+                        .WithMany()
                         .HasForeignKey("LoanId");
                 });
 

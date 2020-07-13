@@ -23,6 +23,8 @@
     <Compile Remove="Contexts\Migrations\20200514204929_Init.Designer.cs" />
     <Compile Remove="Contexts\Migrations\20200514205438_Initv2.cs" />
     <Compile Remove="Contexts\Migrations\20200514205438_Initv2.Designer.cs" />
+    <Compile Remove="Contexts\Migrations\20200713135416_HistoryOnDEBS.cs" />
+    <Compile Remove="Contexts\Migrations\20200713135416_HistoryOnDEBS.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
