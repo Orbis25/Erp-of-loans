@@ -101,7 +101,8 @@ namespace BusinesLogic.Services.HiLoans
                     deb.IsExtraMount = extraMount > 0;
                     deb.State = State.Payment;
                     deb.AllowPayInterest = false;
-                    _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share, IdLoan = deb.LoanId, ToPay = deb.ToPay, ExtraMount = 0, EndBalance = deb.EndBalance, State = State.Payment });
+                    decimal endbalance = deb.EndBalance - extraMount;
+                    _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share, IdLoan = deb.LoanId, ToPay = deb.ToPay, ExtraMount = extraMount, EndBalance = endbalance, State = State.Payment });
 
                     _dbContext.Debs.Update(deb);
                     await _dbContext.SaveChangesAsync();
