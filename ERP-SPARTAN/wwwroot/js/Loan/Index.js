@@ -476,9 +476,6 @@ const showPaymentDeb = (idLoan, idDeb, isDeb, amortizacion, capitalFormated, int
 };
 
 
-
-
-
 /*GET AMORTIZATION**/
 
 const GetAmortization = () => {
@@ -556,6 +553,7 @@ const reenganch = (id) => {
     Swal.fire({
         title: "Nuevo Reenganche",
         icon: 'info',
+      
         showCancelButton: false,
         showConfirmButton: false,
         confirmButtonColor: '#3085d6',
@@ -573,9 +571,8 @@ const getReclosingHistory = (id) => {
     });
 };
 
-
 const amortitationTypevalue = document.getElementById("amortitationType");
- 
+
 showOrHideField(amortitationTypevalue);
 $('#amortitationType').on('change', function () {
     showOrHideField(amortitationTypevalue);
@@ -599,4 +596,46 @@ function showOrHideField(elemento) {
         $("#Containercuotas").css('display', 'block');
     }
 }
+
+const customPrint = (id, idToRemoveClass = "", classToRemove = "") => {
+    new Promise((resolve, reject) => {
+        resolve($(`#${id}`).print({ iframe: false }));
+    }).then(() => {
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    });
+};
+
+const GetPaymentReceipt = (debId) => {
+    const container = $('#payment-receipt');
+    Swal.showLoading();
+    fetch(`/Loan/GetPaymentReceipt?debId=${debId}`).then((response) => response.text()).then((result) => {
+        container.empty();
+        container.append(result);
+        Swal.close();
+    }).then(() => {
+
+        container.print();
+    });
+};
+
+const GetHistoryPaymentsLoan = (loanId) => {
+    const container = $('#payment-receipt');
+    Swal.showLoading();
+    fetch(`/Loan/GetHistoryPaymentsLoan?loanId=${loanId}`).then((response) => response.text()).then((result) => {
+        Swal.close();
+        Swal.fire({
+            showCancelButton: false,
+            width: 1000,
+            showConfirmButton: false,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Confirmar',
+            html: result
+        });
+    })
+};
+
+
 

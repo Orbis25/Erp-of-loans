@@ -1,0 +1,60 @@
+﻿@model ReceiptVM
+
+<div class="row">
+    <div class="col-4"></div>
+    <div class="col-4"></div>
+    <div class="col-4">
+        <h3 style="color:#0d355d;">@Model?.CompanyName</h3>
+        <p>
+            <span>@Model?.Address</span><br />
+            <i class="mt-1">
+                <strong>RNC:</strong>@Model?.Rnc <strong class="ml-3">TELEFONO:</strong>@Model?.PhoneNumber
+            </i>
+        </p>
+        <p style="text-align:end;">Fecha : <strong>@DateTime.Now.ToString("dd/MM/yyyy")</strong></p>
+
+    </div>
+    <div class="col-12">
+        <p><strong>No:</strong>@Guid.NewGuid().ToString().Substring(0, 5)-@Model.Deb.CreateAt.Year</p>
+        <h1 class="text-center" style="color:#0d355d;">RECIBO DE PAGO</h1>
+    </div>
+    <div class="col-12 mb-4">
+        <label><strong>RECIBIMOS DE :</strong></label><input class="ml-2" value="@Model.Deb.Loan.ClientUser.User.FullName" style="width:90%; border-top:none;border-left:none;border-right:none;" />
+    </div>
+    <div class="col-12">
+        <label><strong>POR CONCEPTO DE :</strong></label><input class="ml-2" value="Pago de cuota no. @Model.Deb.Share" style="width:50%; border-top:none;border-left:none;border-right:none;" />
+
+        <label><strong>MONTO :</strong></label><input value="$@Model.Amount" class="decimal" style="width:30%; border-top:none;border-left:none;border-right:none;" />
+
+    </div>
+    <div class="col-8 mt-5">
+        <p class="text-muted">
+            TOTAL RECIBO: $<span class="decimal">@Model.Amount</span> <span class="ml-5"> INTERESS: $<span class="decimal">@Model.Interes</span></span>
+            <span class="ml-5"> MONTO EXTRA: $<span class="decimal">@Model.ExtraAmount</span></span>
+            @if (Model.IsExtraAmount)
+            {
+                <span class="ml-5"> MONTO CUOTA: $<span class="decimal">@Model.ToPay</span></span>
+            }
+            <br />
+            <span class=""><strong>CAPITAL RESTANTE: $<span class="decimal">@Model.ActualCapital</span></strong></span>
+        </p>
+        <p class="text-muted"></p>
+
+    </div>
+
+    <div class="col-4 mt-5">
+        <input style="width:100%; border-top:none;border-left:none;border-right:none;" />
+        <p class="text-center"><u>FIRMA RESPONSABLE</u></p>
+    </div>
+    <div class="col-12">
+        <label>SOLO INTERES</label>
+        <input type="checkbox" name="name" asp-for="OnlyInteres" />
+        <label class="ml-3">MONTO EXTRA</label>
+        <input type="checkbox" name="name" asp-for="IsExtraAmount" />
+        <label class="ml-3">PAGO NORMAL</label>
+        <input type="checkbox" name="name" asp-for="IsNormal" />
+    </div>
+</div>
+<script>
+    $('.decimal').mask("#,##0.00", { reverse: true });
+</script>

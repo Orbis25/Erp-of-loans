@@ -314,6 +314,9 @@ namespace ERP_SPARTAN.Data.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("BankId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
@@ -337,6 +340,8 @@ namespace ERP_SPARTAN.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BankId");
 
                     b.HasIndex("EnterpriseId");
 
@@ -427,6 +432,9 @@ namespace ERP_SPARTAN.Data.Migrations
                     b.Property<decimal>("Interest")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsUpToDate")
+                        .HasColumnType("bit");
+
                     b.Property<int>("PaymentModality")
                         .HasColumnType("int");
 
@@ -452,6 +460,110 @@ namespace ERP_SPARTAN.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Loans");
+                });
+
+            modelBuilder.Entity("Models.Models.HiLoans.Bank", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Banks");
+                });
+
+            modelBuilder.Entity("Models.Models.HiLoans.Company", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Rnc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("Models.Models.HiLoans.HistoryPaymentsLoan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndBalance")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ExtraMount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("IdLoan")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("LoanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Share")
+                        .HasColumnType("int");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<double>("ToPay")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdateAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("outstanding")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LoanId");
+
+                    b.ToTable("HistoryPaymentsLoan");
                 });
 
             modelBuilder.Entity("Models.Models.HiLoans.ReclosingHistory", b =>
@@ -647,6 +759,10 @@ namespace ERP_SPARTAN.Data.Migrations
 
             modelBuilder.Entity("Models.Models.ClientUser", b =>
                 {
+                    b.HasOne("Models.Models.HiLoans.Bank", "Bank")
+                        .WithMany()
+                        .HasForeignKey("BankId");
+
                     b.HasOne("Models.Models.Accounting.Enterprise", "Enterprise")
                         .WithMany()
                         .HasForeignKey("EnterpriseId")
@@ -678,6 +794,20 @@ namespace ERP_SPARTAN.Data.Migrations
                     b.HasOne("Models.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Models.Models.HiLoans.Company", b =>
+                {
+                    b.HasOne("Models.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("Models.Models.HiLoans.HistoryPaymentsLoan", b =>
+                {
+                    b.HasOne("Models.Models.HiAccounting.Loan", "Loan")
+                        .WithMany("HistoryPaymentsLoans")
+                        .HasForeignKey("LoanId");
                 });
 
             modelBuilder.Entity("Models.Models.HiLoans.ReclosingHistory", b =>

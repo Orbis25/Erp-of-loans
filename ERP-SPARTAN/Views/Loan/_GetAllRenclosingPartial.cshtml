@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Models.Models.HiAccounting.Loan>
+<table class="table table-bordered data-table" width="100%" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Empresa</th>
+            <th>Tasa de interes %</th>
+            <th>Capital Inicial</th>
+            <th>Tipo de amortización</th>
+            <th>Modalidad de pago</th>
+            <th>Opciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.ClientUser.User.FullName
+                    <i class="ml-5 col-smd d-inline d-sm-inline d-md-inline d-lg-none text-danger " style="font-weight:bold">(pulsame para ver mas información)</i>
+                </td>
+                <td>@item.ClientUser.Enterprise.Name</td>
+                <td>@item.Interest%</td>
+                <td>@item.InitialCapital</td>
+                <td>@item.AmortitationType.GetDisplayName()</td>
+                <td>@item.PaymentModality.GetDisplayName()</td>
+                <td>
+                    <div>
+                        <a asp-action="GetById" asp-route-id="@item.Id" class="btn btn-success"><i class="far fa-eye text-white"></i></a>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $('.data-table').DataTable();
+</script>

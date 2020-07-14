@@ -6,12 +6,14 @@ using BusinesLogic.Interfaces;
 using BusinesLogic.Interfaces.Alerts;
 using BusinesLogic.Interfaces.HiAccouting;
 using BusinesLogic.Interfaces.HiLoans;
+using BusinesLogic.Interfaces.Shared;
 using BusinesLogic.Repository.Interfaces;
 using BusinesLogic.Repository.Services;
 using BusinesLogic.Services;
 using BusinesLogic.Services.Alerts;
 using BusinesLogic.Services.HiAccouting;
 using BusinesLogic.Services.HiLoans;
+using BusinesLogic.Services.Shared;
 using Models.Contexts;
 using Models.Models;
 
@@ -29,6 +31,8 @@ namespace BusinesLogic.UnitOfWork
         private LoanService _loanService;
         private AlertService _alertService;
         private RoleService _roleService;
+        private CompanyService _companyService;
+        private BankService _bankService;
 
         public UnitOfWork(ApplicationDbContext context) => _context = context;
 
@@ -51,6 +55,10 @@ namespace BusinesLogic.UnitOfWork
         public IAlertService AlertService => _alertService ?? (_alertService = new AlertService(_context));
 
         public IRoleService RoleService => _roleService ?? (_roleService = new RoleService(_context));
+
+        public ICompanyService CompanyService => _companyService ?? (_companyService = new CompanyService(_context));
+
+        public IBankService BankService => _bankService ?? (_bankService = new BankService(_context));
 
         async Task IUnitOfWork.Commit() => await _context.SaveChangesAsync();
         #endregion

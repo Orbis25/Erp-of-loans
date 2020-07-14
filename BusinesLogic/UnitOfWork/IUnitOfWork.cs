@@ -2,6 +2,7 @@
 using BusinesLogic.Interfaces.Alerts;
 using BusinesLogic.Interfaces.HiAccouting;
 using BusinesLogic.Interfaces.HiLoans;
+using BusinesLogic.Interfaces.Shared;
 using BusinesLogic.Repository.Interfaces;
 using Models.Models;
 using System;
@@ -22,7 +23,8 @@ namespace BusinesLogic.UnitOfWork
         ILoanService LoanService { get; }
         IAlertService AlertService { get; }
         IRoleService RoleService { get; }
-
+        ICompanyService CompanyService { get; }
+        IBankService BankService { get; }
         Task Commit();
     }
 }

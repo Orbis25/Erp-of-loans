@@ -23,11 +23,13 @@ namespace ERP_SPARTAN.Controllers
         public LoanController(IUnitOfWork unitOfWork) => _service = unitOfWork;
 
         [HttpGet]
-        public async Task<IActionResult> Index(Guid? idEnterprise = null)
+        public async Task<IActionResult> Index(FilterLoanVM model)
         {
             var userId = GetUserLoggedId();
             ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == userId);
-            return View(await _service.LoanService.GetAllWithRelationShip(userId, idEnterprise));
+            ViewBag.Banks = await _service.BankService.GetListItem();
+            model.Results = await _service.LoanService.GetAllWithRelationShip(userId, model.EnterpriseId, model.BankId);
+            return View(model);
         }
 
         [HttpGet]
@@ -44,7 +46,7 @@ namespace ERP_SPARTAN.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Loan model , string contractDate = null)
+        public async Task<IActionResult> Create(Loan model, string contractDate = null)
         {
             //for change the contract day
             if (!string.IsNullOrEmpty(contractDate)) model.CreateAt = contractDate.ToDateTime();
@@ -92,6 +94,13 @@ namespace ERP_SPARTAN.Controllers
             ViewBag.Selected = stateDeb;
             ViewBag.Action = nameof(GetById);
             ViewBag.AccessUrl = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{nameof(Loan)}/{nameof(GetMyLoan)}";
+
+            #region Have A Company Created 
+            var existCompany = await _service.CompanyService.GetCompanyByUserId(GetUserLoggedId());
+            if (existCompany == null) ViewBag.HaveCompany = false;
+            else ViewBag.HaveCompany = true;
+            #endregion
+
             var result = await _service.LoanService.GetByIdWithRelationships(id, stateDeb);
             if (result == null) new NotFoundView();
             return View(result);
@@ -137,7 +146,7 @@ namespace ERP_SPARTAN.Controllers
         public IActionResult GetAmortization(Loan model, string contractDate = null)
         {
             if (!string.IsNullOrEmpty(contractDate)) model.CreateAt = contractDate.ToDateTime();
-            
+
             return PartialView("_GetAmortizationPartial", _service.LoanService.GetAmortization(model));
         }
 
@@ -210,5 +219,92 @@ namespace ERP_SPARTAN.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetLoanByMonth() => Ok(await _service.LoanService.GetLoanByMonth(GetUserLoggedId()));
+
+        [HttpGet]
+        public async Task<IActionResult> GetBadAndGoodPayments() => Ok(await _service.LoanService.GetBadAndGoodClientPayments(GetUserLoggedId()));
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetPaymentReceipt(Guid debId)
+        {
+            var result = await _service.LoanService.GetReceipt(GetUserLoggedId(), debId);
+            if (result == null) return BadRequest();
+            return PartialView("_GetPaymentReceiptPartial", result);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetHistoryPaymentsLoan(Guid loanId)
+        {
+            var result = await _service.LoanService.GetHistoryPaymentsLoan(loanId);
+            if (result == null) return BadRequest();
+            return PartialView("_GetHistoryPaymentsLoan", result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Report()
+        {
+            ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == GetUserLoggedId());
+            ViewBag.Banks = await _service.BankService.GetListItem();
+
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetReports(FilterOfReportVM model)
+        {
+            ViewBag.Enterprises = await _service.EnterpriseService.GetListItem(x => x.UserId == GetUserLoggedId());
+            ViewBag.Banks = await _service.BankService.GetListItem();
+
+            if (!string.IsNullOrEmpty(model.StartDate) && !string.IsNullOrEmpty(model.EndDate))
+            {
+                model.Results = await _service.LoanService.GetReportOfLoot(GetUserLoggedId(), model);
+                if (model.Results.Any())
+                {
+                    model.Banks = await _service.LoanService.GetBankResumes(GetUserLoggedId(), model);
+                }
+                return View(nameof(Report), model);
+            }
+            BasicNotification("Rango de fecha invalido, intente nuevamente", NotificationType.error, "Error");
+            return RedirectToAction(nameof(Report));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> IsUpToDate(Guid id)
+        {
+            if (id == Guid.Empty) return new NotFoundView();
+            var result = await _service.LoanService.SetOrDisableIsUpToDate(id);
+            if (!result) BasicNotification("Intente de nuevo mas tarde", NotificationType.error);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleIsUpToDateAll()
+        {
+            await _service.LoanService.ToggleAllUpToDate(GetUserLoggedId());
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ClearAllUpToDate()
+        {
+            await _service.LoanService.ClearAllUpToDate(GetUserLoggedId());
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllSoldOut()
+        {
+            var result = await _service.LoanService.GetAllSoldOut(GetUserLoggedId());
+            return  PartialView("_GetAllSoldOutPartial", result);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllRenclosing()
+         => PartialView("_GetAllRenclosingPartial", await _service.LoanService.GetAllRenclosing(GetUserLoggedId()));
+
+
     }
 }

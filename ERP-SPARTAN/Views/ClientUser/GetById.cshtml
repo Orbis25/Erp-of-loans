@@ -51,6 +51,13 @@
                                 <input asp-for="Enterprise.Name" class="form-control" disabled />
                                 <span asp-validation-for="Enterprise.Name" class="text-danger"></span>
                             </div>
+
+                            <div class="form-group">
+                                <label asp-for="BankId" class="control-label">Institucion Financiera de cobro</label>
+                                <select class="form-control" asp-items="ViewBag.Banks" asp-for="BankId">
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label asp-for="Address">Dirección</label>
                                 <textarea asp-for="Address" class="form-control"></textarea>

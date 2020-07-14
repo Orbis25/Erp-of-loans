@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Models.Models.HiAccounting.Loan>
+﻿@model FilterLoanVM
 
 
 
@@ -29,30 +29,29 @@
 
         <div class="row">
             <div class="col-12">
-                <div class="col-md-6 col-12 mb-3">
-                    <label class="col-form-label">Empresas</label>
+                <div class="col-md-6 col-6 mb-3">
                     <form class="form-group form-inline" asp-action="Index" method="get">
                         <div class="form-group">
-                            <select class="form-control m-1" name="idEnterprise" asp-items="ViewBag.Enterprises">
-                                <option value="" selected>Todas las empresas</option>
+                            <select class="form-control m-1" id="idEnterprise" asp-for="EnterpriseId" asp-items="ViewBag.Enterprises">
+                                <option>Todas las empresas</option>
+                            </select>
+                            <select class="form-control m-1" id="idBank" asp-for="BankId" asp-items="ViewBag.Banks">
                             </select>
                             <button class="btn btn-primary m-1"><i class="fa fa-search"></i></button>
                         </div>
                     </form>
                 </div>
             </div>
-
-
             <div class="col">
                 <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Activos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Saldados</a>
+                        <a class="nav-link" id="profile-tab" onclick="showLoading();getSoldOut()" data-toggle="tab" href="#soldOut" role="tab" aria-controls="profile" aria-selected="false">Saldados</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profilex" role="tab" aria-controls="profile" aria-selected="false">Saldados por reenganche</a>
+                        <a class="nav-link" id="profile-tab" onclick="showLoading();getSoldOutReenclosing()" data-toggle="tab" href="#profilex" role="tab" aria-controls="profile" aria-selected="false">Saldados por reenganche</a>
                     </li>
                 </ul>
                 <div class="tab-content" id="myTabContent">
@@ -62,7 +61,26 @@
                                 <table class="table table-bordered data-table" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>Fecha del contrato</th>
+                                            <th>
+                                                ¿Al dia?
+                                                <form asp-action="ToggleIsUpToDateAll" id="DisableIsUpToDateAll" method="post">
+                                                    @if (Model.Results.Any(x => !x.IsUpToDate))
+                                                    {
+                                                        <input type="checkbox" id="checkAll" onchange="setAllIsUpToUpadateLoans()" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="checkbox" id="checkAll" checked onchange="setAllIsUpToUpadateLoans()" />
+                                                    }
+                                                </form>
+                                                @if (Model.Results.Any(x => x.IsUpToDate))
+                                                {
+                                                    <form asp-action="ClearAllUpToDate">
+                                                        <button style="font-size:10px;" class=" btn btn-dark text-white btn-sm btn-block"> limpiar</button>
+                                                    </form>
+                                                }
+                                            </th>
+                                            <th>Contrato</th>
                                             <th>Cliente</th>
                                             <th>Empresa</th>
                                             <th>Tasa de interes %</th>
@@ -73,9 +91,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var item in Model.Where(x => x.ActualCapital > 0 && x.State == State.Active))
+                                        @foreach (var item in Model.Results)
                                         {
                                             <tr>
+                                                <td>
+                                                    <form asp-action="IsUpToDate" id="@item.Id">
+                                                        <input type="hidden" name="id" value="@item.Id" />
+                                                        <input type="checkbox" id="@Guid.NewGuid()" onchange="this.form.submit()" asp-for="@item.IsUpToDate" />
+                                                    </form>
+                                                </td>
                                                 <td>
                                                     @item.CreatedAtStr
                                                     <i class="ml-5 col-smd d-inline d-sm-inline d-md-inline d-lg-none text-danger " style="font-weight:bold">(pulsame para ver mas información)</i>
@@ -98,86 +122,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade mt-5" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                        <div class="">
-                            <table class="table table-bordered data-table" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>Cliente</th>
-                                        <th>Empresa</th>
-                                        <th>Tasa de interes %</th>
-                                        <th>Capital Inicial</th>
-                                        <th>Tipo de amortización</th>
-                                        <th>Modalidad de pago</th>
-                                        <th>Opciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model.Where(x => x.ActualCapital <= 0))
-                                    {
-                                        <tr>
-                                            <td>
-                                                @item.ClientUser.User.FullName
-                                                <i class="ml-5 col-smd d-inline d-sm-inline d-md-inline d-lg-none text-danger " style="font-weight:bold">(pulsame para ver mas información)</i>
-                                            </td>
-                                            <td>@item.ClientUser.Enterprise.Name</td>
-                                            <td>@item.Interest%</td>
-                                            <td>@item.InitialCapital</td>
-                                            <td>@item.AmortitationType.GetDisplayName()</td>
-                                            <td>@item.PaymentModality.GetDisplayName()</td>
-                                            <td>
-                                                <div>
-                                                    <a asp-action="GetById" asp-route-id="@item.Id" class="btn btn-success"><i class="far fa-eye text-white"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="tab-pane fade mt-5 text-center" id="soldOut" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="lds-ellipsis loading  "><div></div><div></div><div></div><div></div></div>
+                        <div id="soldOutContent"></div>
                     </div>
-                    <div class="tab-pane fade mt-5" id="profilex" role="tabpanel" aria-labelledby="profile-tab">
-                        <div class="">
-                            <table class="table table-bordered data-table" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>Cliente</th>
-                                        <th>Empresa</th>
-                                        <th>Tasa de interes %</th>
-                                        <th>Capital Inicial</th>
-                                        <th>Tipo de amortización</th>
-                                        <th>Modalidad de pago</th>
-                                        <th>Opciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model.Where(x => x.State == State.Reclosing))
-                                    {
-                                        <tr>
-                                            <td>
-                                                @item.ClientUser.User.FullName
-                                                <i class="ml-5 col-smd d-inline d-sm-inline d-md-inline d-lg-none text-danger " style="font-weight:bold">(pulsame para ver mas información)</i>
-                                            </td>
-                                            <td>@item.ClientUser.Enterprise.Name</td>
-                                            <td>@item.Interest%</td>
-                                            <td>@item.InitialCapital</td>
-                                            <td>@item.AmortitationType.GetDisplayName()</td>
-                                            <td>@item.PaymentModality.GetDisplayName()</td>
-                                            <td>
-                                                <div>
-                                                    <a asp-action="GetById" asp-route-id="@item.Id" class="btn btn-success"><i class="far fa-eye text-white"></i></a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="tab-pane fade mt-5 text-center" id="profilex" role="tabpanel" aria-labelledby="profile-tab">
+                        <div class="lds-ellipsis loading"><div></div><div></div><div></div><div></div></div>
+                        <div class="" id="RenclosingContent"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<link href="~/css/Loan/Index/style.css" asp-append-version="true" rel="stylesheet" />
+<script asp-append-version="true" src="~/js/Loan/Index/index.js"></script>
 <partial name="_NotificationPartial" />

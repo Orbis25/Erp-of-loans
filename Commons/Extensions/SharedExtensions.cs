@@ -19,7 +19,7 @@ namespace Commons.Extensions
             {
                 return DateTime.ParseExact(date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return DateTime.Now;
             }

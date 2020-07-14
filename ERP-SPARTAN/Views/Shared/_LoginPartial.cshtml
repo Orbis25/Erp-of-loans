@@ -4,33 +4,41 @@
 @inject IOptions<Models.Settings.DefaultValue> options
 
 @{
-    var user = await UserManager.FindByNameAsync(User.Identity.Name);
+    User user = null;
+    if (User.Identity.Name != null)
+    {
+        user = await UserManager.FindByNameAsync(User.Identity.Name);
+    }
 }
 
-@if (SignInManager.IsSignedIn(User))
+@if (user != null)
 {
-    <li class="nav-item">
-        <a asp-action="Profile" asp-controller="User" title="Manage" class="nav-link text-dark">
-            <div class="row justify-content-center ">
-                <div class="col-6">
-                    <img class="img-profile" width="100%" src="@options.Value.Avatar@User.Identity.Name&&size=100&background=ffffff" alt="@User.Identity.Name .png">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a asp-action="Profile" asp-controller="User" title="Manage" class="nav-link text-dark">
+                <div class="row justify-content-center ">
+                    <div class="col-6">
+                        <img class="img-profile" width="100%" src="@options.Value.Avatar@User.Identity.Name&&size=100&background=ffffff" alt="@User.Identity.Name .png">
+                    </div>
+                    <div class="col-12 text-center">
+                        <i class="userName">@user?.FullName</i>
+                    </div>
                 </div>
-                <div class="col-12 text-center">
-                    <i class="userName">@user?.FullName</i>
-                </div>
-            </div>
-            <hr />
-        </a>
-    </li>
+                <hr />
+            </a>
+        </li>
+
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
+
 
 }
-else
-{
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
-}
-

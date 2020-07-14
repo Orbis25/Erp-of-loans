@@ -15,15 +15,19 @@
     <link href="~/vendor/datatables/rowreorder/rowReorder.dataTables.min.css" rel="stylesheet" />
     <link href="~/vendor/datatables/rowreorder/responsive.dataTables.min.css" rel="stylesheet" />
     <!-- Scripts--->
+    <!-- FOR ELECTRONJS--->
+    <script>if (typeof module === 'object') { window.module = module; module = undefined; }</script>
     <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
     <script src="~/vendor/sweetAlert/sweetalert2.all.min.js" asp-append-version="true"></script>
     <script src="~/lib/jquery-mask/jquery.mask.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap-datepicker/js/bootstrap-datepicker.js" asp-append-version="true"></script>
     <script src="~/lib/stacktable.js/stacktable.js" asp-append-version="true"></script>
+    <script src="~/lib/jQuery.print/jQuery.print.min.js" asp-append-version="true"></script>
+    <script>if (window.module) module = window.module;</script>
 </head>
 <body id="page-top">
     <header>
-        <nav  class="navbar navbar-expand-lg ">
+        <nav class="navbar navbar-expand-lg ">
             <i class="fa fa-bars text-white" style="margin:20px; cursor:pointer;" onclick="showOrHideElement('nav-side')"></i><partial name="_TitlePartial" />
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -34,7 +38,6 @@
             </div>
         </nav>
     </header>
-
     <div id="wrapper">
         <!-- Sidebar -->
         <ul id="nav-side" class="sidebar navbar-nav ct-bg-secundary">
@@ -63,10 +66,16 @@
             </footer>
         </div>
     </div>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/vendor/datatables/jquery.dataTables.js" asp-append-version="true"></script>
     <script src="~/vendor/datatables/dataTables.responsive.js" asp-append-version="true"></script>
+    <script src="~/vendor/datatables/buttons-export/dataTables.buttons.min.js"></script>
+    <script src="~/vendor/datatables/buttons-export/jszip.min.js"></script>
+    <script src="~/vendor/datatables/buttons-export/pdfmake.min.js"></script>
+    <script src="~/vendor/datatables/buttons-export/buttons.flash.min.js"></script>
+    <script src="~/vendor/datatables/buttons-export/buttons.html5.min.js"></script>
+    <script src="~/vendor/datatables/buttons-export/buttons.print.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
     <!-- Latest compiled and minified JavaScript -->

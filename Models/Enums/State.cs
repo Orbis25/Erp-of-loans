@@ -21,7 +21,11 @@ namespace Models.Enums
         #endregion
 
         #region FOR LOANS
-        Reclosing
+        Reclosing,
+        #endregion
+        #region FOR HistoryPaymentsLoan
+        OnlyInterest,
+        Cancelled
         #endregion
     }
 }

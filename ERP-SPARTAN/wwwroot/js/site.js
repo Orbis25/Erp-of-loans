@@ -4,7 +4,7 @@
 // Write your JavaScript code.
 
 
-$(document).ready(() => {
+const loadDataTable = () => {
     $('.data-table').DataTable({
         pageLength: 50,
         "language": {
@@ -21,9 +21,18 @@ $(document).ready(() => {
         rowReorder: {
             selector: 'td:nth-child(2)'
         },
+        dom: 'Bfrtip',
+        buttons: [
+            'csv', 'excel'
+        ],
         responsive: true
     });
+};
 
+
+$(document).ready(() => {
+
+    loadDataTable();
     //Get all actives alerts
     fetch('/Alert/Quantity').then((result) => result.json()).then((response) => $('#qyt-alert').text(response));
 
@@ -35,6 +44,15 @@ $(document).ready(() => {
     });
 
     $('.input-date').datepicker('setDate', new Date());
+
+    $('.input-date-no-default').datepicker({
+        format: "dd/mm/yyyy",
+        orientation: "bottom auto",
+        autoclose: true,
+        endDate: new Date()
+    });
+
+    $('.input-date-no-default').keypress((e) => false);
 
 });
 
@@ -69,3 +87,6 @@ const printElement = (id) => {
     setTimeout(() => { newWind.close(); }, 1);
 };
 
+const print = (id) => {
+    $(`#${id}`).print({});
+};

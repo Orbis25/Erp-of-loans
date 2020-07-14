@@ -28,7 +28,9 @@
 </div>
 <hr />
 
-<div class="card">
+
+
+<div class="card" id="loanContainer">
     <div class="card-body">
         <div class="row">
             <div class="col-12 col-sm-12 col-md-12">
@@ -107,7 +109,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-sm btn-dark text-white" onclick="window.print()">Imprimir</button>
+                        <button type="button" class="btn btn-sm btn-dark text-white" onclick="customPrint('loanContainer','tbl-deb','stack')">Imprimir</button>
                         @if (Model.State != State.Reclosing)
                         {
                             @if (User.IsInRole(nameof(RolsAuthorization.HILoans)))
@@ -115,6 +117,11 @@
                                 <button class="btn btn-sm btn-danger" onclick="ShowSweetConfirmRemoveDialog('@Model.Id','/Loan','Remove','Esta operación no puede ser revertida','Esta seguro?','/Loan/Index',)">Cancelar prestamo</button>
                                 <a asp-action="Reclosing" asp-route-Id="@Model.Id" class="btn btn-sm btn-dark">Reenganche</a>
                                 <button type="button" class="btn btn-sm btn-dark text-white" onclick="getAccess('@ViewBag.AccessUrl','@Model.Id')"> Conceder Acceso</button>
+
+                                <button onclick="GetHistoryPaymentsLoan('@Model.Id')" class="btn btn-sm btn-dark">
+                                    <i class="fas fa-receipt"></i>
+                                     Historial de pagos
+                                </button>
                             }
                         }
                         @if (Model.State == State.Reclosing)
@@ -167,15 +174,27 @@
 
                                         }
                                     </select>
-                                    <button class="btn btn-sm btn-success mt-1">Filtrar</button>
+                                    <button class="btn btn-sm btn-success mt-1 mb-3">Filtrar</button>
                                 </form>
                             </div>
+                            <div class="col-md-8"></div>
+                            <div class="col-12">
+                                @if (ViewBag.HaveCompany != null && !ViewBag.HaveCompany)
+                                {
+                                    <div class="alert alert-info" role="alert">
+                                        <strong>IMPORTANTE:</strong> <p>SI DESEAS IMPRIMIR LOS RECIBOS DE PAGOS ES NECESARIO QUE CONFIGURES EL NOMBRE DE TU EMPRESA,RNC Y DEMAS. <br /> DIRIGETE A LA PESTAÑA DE CONFIGURACION Y COLOCA LOS DATOS DE TU EMPRESA DE MANERA CORRECTA.</p>
+                                    </div>
+                                }
+                            </div>
+
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <table class="table table-bordered mt-4 stack" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>Cuota</th>
+                                                <th>
+                                                    Cuota
+                                                </th>
                                                 <th>Fecha</th>
                                                 <th>Capital</th>
                                                 <th>Interés</th>
@@ -218,7 +237,9 @@
 
 
                                                 <tr class="@bgClass">
-                                                    <td>@item.Share</td>
+                                                    <td>
+                                                        @item.Share
+                                                    </td>
                                                     <td>@item.DateOfPaymentFormated</td>
                                                     <td>@item.AmortitationFormated</td>
                                                     <td>@item.InterestFormated</td>
@@ -250,6 +271,16 @@
 
                                                                 }
                                                             }
+
+                                                            if (item.State == State.Payment || item.AllowPayInterest)
+                                                            {
+                                                                if (ViewBag.HaveCompany != null && ViewBag.HaveCompany)
+                                                                {
+                                                                    <button onclick="GetPaymentReceipt('@item.Id')" class="btn btn-sm btn-dark">
+                                                                        <i class="fas fa-print"></i>
+                                                                    </button>
+                                                                }
+                                                            }
                                                         }
                                                         else
                                                         {
@@ -277,7 +308,13 @@
                                     </table>
                                     <input type="hidden" id="amortizationTotal" value="@Math.Round(amortitation, 2)" />
                                 </div>
+
+
                             </div>
+
+
+
+
                         </div>
                     </div>
                     <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
@@ -289,6 +326,17 @@
 
     </div>
 </div>
+
+
+<!--PAYMENT BILL load with partialview-->
+<div class="container" style="display:none;">
+    <div class="card">
+        <div class="card-body p-5" style="border: 2px solid #0d355d;" id="payment-receipt">
+
+        </div>
+    </div>
+</div>
+<!--END PAYMENT BILL-->
 
 <script src="~/js/Loan/Index.js" asp-append-version="true"></script>
 <script src="~/js/Shared/httpRequest.js" asp-append-version="true"></script>

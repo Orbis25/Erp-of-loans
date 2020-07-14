@@ -1,4 +1,7 @@
 ﻿
+
+
+/*LINE CHARTJS*/
 fetch('/Loan/GetLoanByMonth').then((result) => result.json()).then((response) => {
     var data = response.map(x => x.quantity);
     var labels = response.map(x => x.month);
@@ -54,4 +57,46 @@ fetch('/Loan/GetLoanByMonth').then((result) => result.json()).then((response) =>
     });
     /*En home*/
 });
+/*END LINE CHARTJS*/
 
+
+/*Calcultorjs*/
+
+const changeElementsInputs = () => {
+    if (Number($('#amortitationType').val()) === 0) {
+        $('#container-amountRate').show();
+        $('#container-numberRate').hide();
+    } else {
+        $('#container-amountRate').hide();
+        $('#container-numberRate').show();
+
+    }
+
+};
+
+const getCalculatorResult = () => {
+    const inputs = $('#calculator-form').find(":input");
+    const amortizationType = inputs[0].value;
+    const initCapital = inputs[1].value;
+    const typeOfTasa = inputs[2].value;
+    const interest = inputs[3].value;
+    const paymentModality = inputs[5].value;
+
+    const amountDeb = inputs[4].value;
+
+
+    const shares = inputs[6].value;
+
+
+
+    const querystr = `?InitialCapital=${initCapital}&ActualCapital=${initCapital}&Interest=${interest}
+                        &Shares=${shares}&RateType=${typeOfTasa}&AmortitationType=${amortizationType}
+                         &PaymentModality=${paymentModality}&AmountDeb=${amountDeb}&contractDate=${new Date()}&`;
+    fetch(`/Loan/GetAmortization${querystr}"`).then(result => result.text()).then((response) => {
+        $('#calculator-result').empty();
+        $('#calculator-result').html(response);
+    });
+};
+
+
+/*end calculatorjs*/

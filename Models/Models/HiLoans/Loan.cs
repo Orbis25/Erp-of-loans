@@ -47,8 +47,10 @@ namespace Models.Models.HiAccounting
         public ClientUser ClientUser { get; set; }
         public virtual IEnumerable<Deb> Debs { get; set; }
         public virtual IEnumerable<ReclosingHistory> ReclosingHistories { get; set; }
+        public virtual IEnumerable<HistoryPaymentsLoan> HistoryPaymentsLoans { get; set; }
         [Column(TypeName = "decimal(18,2)")]
         public decimal AmountDeb { get; set; }
+        public bool IsUpToDate { get; set; } = false;
 
         [NotMapped]
         public string SharesStr { get; set; }
@@ -58,8 +60,6 @@ namespace Models.Models.HiAccounting
         [Column(TypeName = "decimal(18,2)")]
         [NotMapped]
         public decimal ReclosingInitialAmount { get; set; }
-
-
         [NotMapped]
         public Guid IdLoanForReclosing { get; set; }
 

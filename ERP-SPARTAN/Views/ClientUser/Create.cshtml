@@ -44,20 +44,38 @@
                                oninput="setCustomValidity('')" />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="IdentificationCard" class="control-label">Cedula</label>
-                        @if (User.IsInRole(nameof(RolsAuthorization.HILoans)))
-                        {
+
+
+
+                    @if (User.IsInRole(nameof(RolsAuthorization.HILoans)))
+                    {
+                        <div class="form-group">
+                            <label asp-for="BankId" class="control-label"></label>
+                            <select class="form-control" asp-items="ViewBag.Banks" asp-for="BankId">
+                            </select>
+                        </div>
+                        <div class="form-group">
+
+                            <label asp-for="IdentificationCard" class="control-label">Cedula</label>
                             <input asp-for="IdentificationCard" class="form-control"
                                    required=""
                                    oninvalid="this.setCustomValidity('Campo requerido')"
                                    oninput="setCustomValidity('')" />
-                        }
-                        else
-                        {
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group">
+                            <label asp-for="IdentificationCard" class="control-label">Cedula</label>
                             <input asp-for="IdentificationCard" class="form-control" />
-                        }
-                    </div>
+                        </div>
+
+                    }
+
+
+
+
+
                     <div class="form-group">
                         <label asp-for="PhoneNumber" class="control-label">Numero</label>
                         <input asp-for="PhoneNumber" id="phoneNumber" class="form-control"
