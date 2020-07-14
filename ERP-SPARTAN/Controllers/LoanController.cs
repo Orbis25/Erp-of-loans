@@ -231,6 +231,7 @@ namespace ERP_SPARTAN.Controllers
             if (result == null) return BadRequest();
             return PartialView("_GetPaymentReceiptPartial", result);
         }
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetHistoryPaymentsLoan(Guid loanId)
@@ -257,7 +258,7 @@ namespace ERP_SPARTAN.Controllers
 
             if (!string.IsNullOrEmpty(model.StartDate) && !string.IsNullOrEmpty(model.EndDate))
             {
-                model.Results = await _service.LoanService.GetReportOfLoot(GetUserLoggedId(),model);
+                model.Results = await _service.LoanService.GetReportOfLoot(GetUserLoggedId(), model);
                 if (model.Results.Any())
                 {
                     model.Banks = await _service.LoanService.GetBankResumes(GetUserLoggedId(), model);
@@ -267,6 +268,43 @@ namespace ERP_SPARTAN.Controllers
             BasicNotification("Rango de fecha invalido, intente nuevamente", NotificationType.error, "Error");
             return RedirectToAction(nameof(Report));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> IsUpToDate(Guid id)
+        {
+            if (id == Guid.Empty) return new NotFoundView();
+            var result = await _service.LoanService.SetOrDisableIsUpToDate(id);
+            if (!result) BasicNotification("Intente de nuevo mas tarde", NotificationType.error);
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleIsUpToDateAll()
+        {
+            await _service.LoanService.ToggleAllUpToDate(GetUserLoggedId());
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ClearAllUpToDate()
+        {
+            await _service.LoanService.ClearAllUpToDate(GetUserLoggedId());
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllSoldOut()
+        {
+            var result = await _service.LoanService.GetAllSoldOut(GetUserLoggedId());
+            return  PartialView("_GetAllSoldOutPartial", result);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllRenclosing()
+         => PartialView("_GetAllRenclosingPartial", await _service.LoanService.GetAllRenclosing(GetUserLoggedId()));
+
 
     }
 }

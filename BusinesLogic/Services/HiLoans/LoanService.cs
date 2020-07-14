@@ -38,7 +38,8 @@ namespace BusinesLogic.Services.HiLoans
 
         public async Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null, Guid? bankId = null)
         {
-            var result = Filter(x => x.UserId == userId).Include(x => x.Debs)
+            var result = Filter(x => x.UserId == userId && x.State == State.Active && x.ActualCapital > 0)
+                .Include(x => x.Debs)
                 .Include(x => x.ClientUser.Enterprise)
                 .Include(x => x.ReclosingHistories)
                 .Include(x => x.ClientUser)
@@ -81,16 +82,19 @@ namespace BusinesLogic.Services.HiLoans
             _dbContext.Update(loan);
             await _dbContext.SaveChangesAsync();
             var result = false;
- 
+
             if (interestOnly && deb.State != State.Payment)
             {
                 deb.AllowPayInterest = interestOnly;
-                _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share,IdLoan=deb.LoanId,ToPay=deb.ToPay,ExtraMount=0,EndBalance=deb.EndBalance, State =State.OnlyInterest });
+                _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share, IdLoan = deb.LoanId, ToPay = deb.ToPay, ExtraMount = 0, EndBalance = deb.EndBalance, State = State.OnlyInterest });
 
                 _dbContext.Debs.Update(deb);
-               
-                await _dbContext.SaveChangesAsync();
-                await RecalculateDebs(idLoan, 0, false, interestOnly);
+
+                if (await CommitAsync())
+                {
+                    await RecalculateDebs(idLoan, 0, false, interestOnly);
+                }
+
 
             }
             else
@@ -105,7 +109,7 @@ namespace BusinesLogic.Services.HiLoans
                     _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share, IdLoan = deb.LoanId, ToPay = deb.ToPay, ExtraMount = extraMount, EndBalance = endbalance, State = State.Payment });
 
                     _dbContext.Debs.Update(deb);
-                    await _dbContext.SaveChangesAsync();
+                    await CommitAsync();
                 }
                 else
                 {
@@ -115,8 +119,12 @@ namespace BusinesLogic.Services.HiLoans
                     deb.State = State.Active;
                     _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share, IdLoan = deb.LoanId, ToPay = deb.ToPay, ExtraMount = extraMount, EndBalance = deb.EndBalance, State = State.Cancelled });
                     _dbContext.Debs.Update(deb);
-                    await _dbContext.SaveChangesAsync();
-                    if (extra > 0) await RecalculateDebs(idLoan, extra, false);
+
+                    if (await CommitAsync())
+                    {
+                        if (extra > 0) await RecalculateDebs(idLoan, extra, false);
+                    }
+
                 }
             }
 
@@ -124,8 +132,10 @@ namespace BusinesLogic.Services.HiLoans
             if (extraMount > 0)
             {
                 _dbContext.Debs.Update(deb);
-                await _dbContext.SaveChangesAsync();
-                result = await RecalculateDebs(idLoan, extraMount);
+                if (await CommitAsync())
+                {
+                    result = await RecalculateDebs(idLoan, extraMount);
+                }
             }
             return result;
         }
@@ -381,7 +391,7 @@ namespace BusinesLogic.Services.HiLoans
             }
         }
 
-        private async Task AddDebs(Loan model, DateTime lastDateTime, int count = 0, bool interestOnly = false)
+        private async Task<bool> AddDebs(Loan model, DateTime lastDateTime, int count = 0, bool interestOnly = false)
         {
             IEnumerable<Deb> debs;
             if (model.AmortitationType == AmortitationType.Open_o_Personalfee)
@@ -399,13 +409,13 @@ namespace BusinesLogic.Services.HiLoans
             else debs = CapitalEndDebs(model, lastDateTime, count, interestOnly);
 
             _dbContext.Debs.AddRange(debs);
-            await _dbContext.SaveChangesAsync();
+            return await CommitAsync();
         }
 
         private async Task<bool> RemoveAllDebs(IEnumerable<Deb> debs)
         {
             _dbContext.Debs.RemoveRange(debs);
-            return await _dbContext.SaveChangesAsync() > 0;
+            return await CommitAsync();
         }
 
         private async Task<bool> RecalculateDebs(Guid idLoan, decimal extraMount, bool isDiscount = true, bool interestOnly = false)
@@ -429,13 +439,13 @@ namespace BusinesLogic.Services.HiLoans
                 }
                 _dbContext.Loans.Update(loan);
 
-                if (await _dbContext.SaveChangesAsync() > 0)
+                if (await CommitAsync())
                 {
                     var dateOfPayment = DateTime.Now;
                     if (lastPayment != null) dateOfPayment = lastPayment.DateOfPayment;
                     if (actualPayment != null) dateOfPayment = actualPayment.AllowPayInterest ? actualPayment.DateOfPayment : dateOfPayment;
-                    await AddDebs(loan, dateOfPayment, count, interestOnly);
-                    result = true;
+                    if (await AddDebs(loan, dateOfPayment, count, interestOnly)) result = true;
+                    else result = false;
                 }
             }
             return result;
@@ -596,9 +606,10 @@ namespace BusinesLogic.Services.HiLoans
                 Deb = deb
             };
         }
-        public async Task<Loan> GetHistoryPaymentsLoan(Guid Loanid) {
-            var result =  await _dbContext.Loans.Where(x => x.Id == Loanid).Include(x=>x.HistoryPaymentsLoans).FirstAsync();
-            var resultHistoryPaymentsLoans =  await _dbContext.HistoryPaymentsLoan.Where(x => x.IdLoan == Loanid).ToListAsync();
+        public async Task<Loan> GetHistoryPaymentsLoan(Guid Loanid)
+        {
+            var result = await _dbContext.Loans.Where(x => x.Id == Loanid).Include(x => x.HistoryPaymentsLoans).FirstAsync();
+            var resultHistoryPaymentsLoans = await _dbContext.HistoryPaymentsLoan.Where(x => x.IdLoan == Loanid).ToListAsync();
             var pendingsDebs = await _dbContext.Debs.CountAsync(x => x.State == State.Active && x.LoanId == Loanid);
             result.HistoryPaymentsLoans = resultHistoryPaymentsLoans;
             result.SharesStr = pendingsDebs.ToString();
@@ -658,5 +669,37 @@ namespace BusinesLogic.Services.HiLoans
             });
 
         }
+
+        public async Task<bool> SetOrDisableIsUpToDate(Guid id)
+        {
+            var result = await GetById(id);
+            result.IsUpToDate = !result.IsUpToDate;
+            return await Update(result);
+        }
+
+        public async Task ToggleAllUpToDate(string userId)
+        {
+            var results = Filter(x => x.UserId == userId);
+            if (results.Any(x => !x.IsUpToDate)) await results.ForEachAsync(x => x.IsUpToDate = true);
+            else await results.ForEachAsync(x => x.IsUpToDate = false);
+            _dbContext.UpdateRange(results);
+            await CommitAsync();
+        }
+
+        public async Task ClearAllUpToDate(string userId)
+        {
+            var results = Filter(x => x.UserId == userId);
+            await results.ForEachAsync(x => x.IsUpToDate = false);
+            _dbContext.UpdateRange(results);
+            await CommitAsync();
+        }
+
+        public async Task<ICollection<Loan>> GetAllSoldOut(string userId)
+            => await Filter(x => x.ActualCapital <= 0 && x.UserId == userId).Include(x => x.ClientUser.User)
+            .Include(x => x.ClientUser).ThenInclude(x => x.Enterprise).ToListAsync();
+
+        public async Task<ICollection<Loan>> GetAllRenclosing(string userId)
+            => await Filter(x => x.State == State.Reclosing && x.UserId == userId).Include(x => x.ClientUser.User)
+            .Include(x => x.ClientUser).ThenInclude(x => x.Enterprise).ToListAsync();
     }
 }

@@ -4,7 +4,7 @@
 // Write your JavaScript code.
 
 
-$(document).ready(() => {
+const loadDataTable = () => {
     $('.data-table').DataTable({
         pageLength: 50,
         "language": {
@@ -27,7 +27,12 @@ $(document).ready(() => {
         ],
         responsive: true
     });
+};
 
+
+$(document).ready(() => {
+
+    loadDataTable();
     //Get all actives alerts
     fetch('/Alert/Quantity').then((result) => result.json()).then((response) => $('#qyt-alert').text(response));
 

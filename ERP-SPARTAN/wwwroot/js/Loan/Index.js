@@ -476,9 +476,6 @@ const showPaymentDeb = (idLoan, idDeb, isDeb, amortizacion, capitalFormated, int
 };
 
 
-
-
-
 /*GET AMORTIZATION**/
 
 const GetAmortization = () => {
@@ -574,7 +571,6 @@ const getReclosingHistory = (id) => {
     });
 };
 
-
 const amortitationTypevalue = document.getElementById("amortitationType");
 
 showOrHideField(amortitationTypevalue);
@@ -611,8 +607,6 @@ const customPrint = (id, idToRemoveClass = "", classToRemove = "") => {
     });
 };
 
-
-
 const GetPaymentReceipt = (debId) => {
     const container = $('#payment-receipt');
     Swal.showLoading();
@@ -625,7 +619,6 @@ const GetPaymentReceipt = (debId) => {
         container.print();
     });
 };
-
 
 const GetHistoryPaymentsLoan = (loanId) => {
     const container = $('#payment-receipt');
@@ -643,5 +636,6 @@ const GetHistoryPaymentsLoan = (loanId) => {
         });
     })
 };
+
 
 

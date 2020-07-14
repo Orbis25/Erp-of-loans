@@ -20,10 +20,33 @@ namespace BusinesLogic.Repository.Services
             return await _dbContext.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> CommitAsync()
+        {
+            var result = true;
+
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            {
+                try
+                {
+                    await _dbContext.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+
+                    result = false;
+                    await transaction.RollbackAsync();
+                    Console.WriteLine(ex.InnerException.Message);
+                }
+            }
+
+            return result;
+        }
+
         public IQueryable<TEntity> Filter(Expression<Func<TEntity, bool>> expression = null)
         {
             if (expression == null) return GetAll();
-            return _dbContext.Set<TEntity>().Where(expression); 
+            return _dbContext.Set<TEntity>().Where(expression);
         }
 
         public IQueryable<TEntity> GetAll() => _dbContext.Set<TEntity>().AsQueryable();
@@ -36,13 +59,13 @@ namespace BusinesLogic.Repository.Services
         public async Task<bool> Remove(TEntity entity)
         {
             _dbContext.Set<TEntity>().Remove(entity);
-            return await _dbContext.SaveChangesAsync() > 0;
+            return await CommitAsync();
         }
 
         public virtual async Task<bool> Update(TEntity entity)
         {
             _dbContext.Set<TEntity>().Update(entity);
-            return await _dbContext.SaveChangesAsync() > 0;
+            return await CommitAsync();
         }
     }
 }
