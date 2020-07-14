@@ -5,7 +5,7 @@
             <h2>Historial de pagos</h2>
             <div class="">
                 <p class="d-inline-block mr-1"><b>Capital Pendiente  :</b>   <span style="font-size:15px; font-family:sans-serif" class="badge badge-secondary"> @Model.ActualCapitalFormated  /  @Model.InitialCapitalFormated  </span>    </p>
-                <p class=" d-inline-block "><b> Cuotas Restantes :</b>   <span style="font-size:15px; font-family:sans-serif" class="badge badge-warning">@Model.SharesStr / @Model.Shares  </span>  </p>
+                <p class=" d-inline-block "><b> Cuotas Restantes :</b>   <span style="font-size:15px; font-family:sans-serif" class="badge badge-warning">@Model.SharesStr  </span>  </p>
             </div>
 
         </div>
@@ -14,7 +14,7 @@
                 @foreach (var item in Model.HistoryPaymentsLoans)
                 {
                     var bgClass = ((item.State == State.Payment) ? "success" : (item.State == State.OnlyInterest) ? "warning" : "danger");
-                    var textTotalPagado = item.State == State.Payment ? "Total Pagado" : "Total por pagar";
+                    var textTotalPagado = item.State == State.Payment ? "Total Pagado de la cuota" : "Total por pagar de la cuota";
                     <li class="timeline-item">
                         <div class="timeline-info">
                             <span>@item.DateOfPaymentFormated</span>
@@ -24,8 +24,7 @@
                             <h5 class="timeline-title">Pago a cuota @item.Share  | @item.StateStr</h5>
                             <p style="background-color:gainsboro">
                                 @textTotalPagado : @item.ToPayFormated |
-                                Abono Capital : @item.ExtraMountFormated |
-                                Balance Restante : @item.EndBalance
+                                Abono Capital : @item.ExtraMountFormated 
                             </p>
                         </div>
                     </li>
