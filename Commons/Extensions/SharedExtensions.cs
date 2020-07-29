@@ -24,5 +24,7 @@ namespace Commons.Extensions
                 return DateTime.Now;
             }
         }
+
+        public static bool IsEmpty(this Guid parameter) => parameter == Guid.Empty;
     }
 }

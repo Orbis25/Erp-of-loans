@@ -25,6 +25,8 @@
     <Compile Remove="Contexts\Migrations\20200514205438_Initv2.Designer.cs" />
     <Compile Remove="Contexts\Migrations\20200713135416_HistoryOnDEBS.cs" />
     <Compile Remove="Contexts\Migrations\20200713135416_HistoryOnDEBS.Designer.cs" />
+    <Compile Remove="Contexts\Migrations\20200725140640_InteresOnlyFieldToLoan.cs" />
+    <Compile Remove="Contexts\Migrations\20200725140640_InteresOnlyFieldToLoan.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

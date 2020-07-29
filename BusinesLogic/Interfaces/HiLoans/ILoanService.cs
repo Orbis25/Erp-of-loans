@@ -64,5 +64,21 @@ namespace BusinesLogic.Interfaces.HiLoans
         /// <param name="userId"></param>
         /// <returns></returns>
         Task ClearAllUpToDate(string userId);
+
+        /// <summary>
+        /// AGREGA UNA NOTA A LAS DEUDAS
+        /// </summary>
+        /// <param name="debId"></param>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        Task AddNoteToDeb(Guid debId, string note);
+        /// <summary>
+        /// ELIMINA LA NOTA DE LA DEUDA
+        /// </summary>
+        /// <param name="debId"></param>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        Task RemoveNoteToDeb(Guid debId);
+
     }
 }

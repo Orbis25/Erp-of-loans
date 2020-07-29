@@ -1,5 +1,6 @@
 ﻿using BusinesLogic.Interfaces.HiLoans;
 using BusinesLogic.Repository.Services;
+using Commons.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Models.Contexts;
 using Models.Enums;
@@ -35,7 +36,6 @@ namespace BusinesLogic.Services.HiLoans
             if (result) await AddDebs(model, model.CreateAt);
             return result;
         }
-
         public async Task<IEnumerable<Loan>> GetAllWithRelationShip(string userId, Guid? idEnterprise = null, Guid? bankId = null)
         {
             var result = Filter(x => x.UserId == userId && x.State == State.Active && x.ActualCapital > 0)
@@ -51,7 +51,6 @@ namespace BusinesLogic.Services.HiLoans
 
             return await result.OrderByDescending(x => x.CreateAt).ToListAsync();
         }
-
         public async Task<Loan> GetByIdWithRelationships(Guid id, State state)
         {
             var result = new Loan { };
@@ -68,7 +67,6 @@ namespace BusinesLogic.Services.HiLoans
             result.SharesStr = pendingsDebs.ToString();
             return result;
         }
-
         public async Task<bool> PaymentDeb(Guid id, Guid idLoan, decimal extraMount, bool interestOnly)
         {
             var deb = await _dbContext.Debs.FirstOrDefaultAsync(x => x.Id == id);
@@ -78,24 +76,30 @@ namespace BusinesLogic.Services.HiLoans
             if (!interestOnly)
             {
                 loan.ActualCapital = actualCapital;
+
             }
             _dbContext.Update(loan);
-            await _dbContext.SaveChangesAsync();
+            await CommitAsync();
             var result = false;
+
+            if (interestOnly)
+            {
+                _dbContext.HistoryOnlyInterests.Add(new HistoryOnlyInterest { Amount = deb.Interest, LoanId = idLoan });
+                await CommitAsync();
+            }
 
             if (interestOnly && deb.State != State.Payment)
             {
                 deb.AllowPayInterest = interestOnly;
+
                 _dbContext.HistoryPaymentsLoan.Add(new HistoryPaymentsLoan { Share = deb.Share, IdLoan = deb.LoanId, ToPay = deb.ToPay, ExtraMount = 0, EndBalance = deb.EndBalance, State = State.OnlyInterest });
 
                 _dbContext.Debs.Update(deb);
 
-                if (await CommitAsync())
+                if (await _dbContext.SaveChangesAsync() > 0)
                 {
                     await RecalculateDebs(idLoan, 0, false, interestOnly);
                 }
-
-
             }
             else
             {
@@ -139,7 +143,6 @@ namespace BusinesLogic.Services.HiLoans
             }
             return result;
         }
-
         public async Task<bool> SoftRemove(Guid id)
         {
             var model = await GetById(id);
@@ -166,7 +169,6 @@ namespace BusinesLogic.Services.HiLoans
             }
             return result;
         }
-
         private IEnumerable<Deb> OpenfeeDebs(Loan loan, DateTime lastDateTime, int count = 0, bool interestonly = false)
         {
             double interest = (double)(loan.Interest) / 100;
@@ -230,7 +232,6 @@ namespace BusinesLogic.Services.HiLoans
             }
             return result;
         }
-
         private IEnumerable<Deb> FixedfeeDebs(Loan loan, DateTime lastDateTime, int count = 0, bool interestonly = false)
         {
             double interest = (double)(loan.Interest) / 100;
@@ -266,7 +267,6 @@ namespace BusinesLogic.Services.HiLoans
             }
             return result;
         }
-
         private IEnumerable<Deb> FixedInterestDebs(Loan loan, DateTime lastDateTime, int count = 0, bool interestonly = false)
         {
             double interest = (double)((decimal)loan.Interest) / 100;
@@ -390,7 +390,6 @@ namespace BusinesLogic.Services.HiLoans
                 default: return date.AddYears(1);
             }
         }
-
         private async Task<bool> AddDebs(Loan model, DateTime lastDateTime, int count = 0, bool interestOnly = false)
         {
             IEnumerable<Deb> debs;
@@ -411,13 +410,11 @@ namespace BusinesLogic.Services.HiLoans
             _dbContext.Debs.AddRange(debs);
             return await CommitAsync();
         }
-
         private async Task<bool> RemoveAllDebs(IEnumerable<Deb> debs)
         {
             _dbContext.Debs.RemoveRange(debs);
             return await CommitAsync();
         }
-
         private async Task<bool> RecalculateDebs(Guid idLoan, decimal extraMount, bool isDiscount = true, bool interestOnly = false)
         {
             var result = false;
@@ -450,7 +447,6 @@ namespace BusinesLogic.Services.HiLoans
             }
             return result;
         }
-
         public IEnumerable<Deb> GetAmortization(Loan model)
         {
             IEnumerable<Deb> debs;
@@ -510,7 +506,6 @@ namespace BusinesLogic.Services.HiLoans
         }
         public async Task<IEnumerable<ReclosingHistory>> GetReclosing(Guid id)
             => await _dbContext.ReclosingHistories.Where(x => x.IdLoan == id).ToListAsync();
-
         public async Task<ICollection<PendingClientVM>> GetPaymentPendingClients(string createdBy)
         {
             var result = _dbContext.Loans.AsNoTracking()
@@ -536,7 +531,6 @@ namespace BusinesLogic.Services.HiLoans
                 }); ;
             return await result.ToListAsync();
         }
-
         public async Task<List<MonthLoanVm>> GetLoanByMonth(string userId)
         {
             CultureInfo culture = new CultureInfo("es");
@@ -549,7 +543,6 @@ namespace BusinesLogic.Services.HiLoans
                     Quantity = x.Count()
                 }).ToListAsync();
         }
-
         public async Task<object> GetBadAndGoodClientPayments(string userId)
         {
             var result = _dbContext.Loans.Include(x => x.User)
@@ -568,7 +561,6 @@ namespace BusinesLogic.Services.HiLoans
             }
             return null;
         }
-
         public async Task<ReceiptVM> GetReceipt(string userId, Guid debId)
         {
             var company = await _dbContext.Companies.FirstOrDefaultAsync(x => x.UserId == userId);
@@ -619,11 +611,12 @@ namespace BusinesLogic.Services.HiLoans
         public async Task<ICollection<ReportOfLootVM>> GetReportOfLoot(string userId, FilterOfReportVM model)
         {
             var results = Filter(x => x.UserId == userId
-
               && x.State != State.Reclosing
-             && x.State == State.Active &&
-
-            x.Debs.Where(_ => _.State == model.DebState).Any())
+              && x.State == State.Active
+              && (x.CreateAt >= model.StartDate.ToDateTime() && x.CreateAt <= model.EndDate.ToDateTime())
+              && x.Debs.Where(x => x.State == model.DebState || x.AllowPayInterest).Any())
+                .Include(x => x.Debs)
+                .Include(x => x.HistoryOnlyInterests)
                 .Include(x => x.ClientUser);
 
             if (model.Bank != null)
@@ -635,19 +628,20 @@ namespace BusinesLogic.Services.HiLoans
             {
                 CompanyName = x.ClientUser.Enterprise.Name,
                 Date = x.CreatedAtStr,
-                Loot = x.Debs.Where(x => x.State == model.DebState).Sum(_ => _.Interest),
+                OnlyInterest = x.HistoryOnlyInterests.Sum(x => x.Amount),
+                Debs = x.Debs.Where(x => x.State == model.DebState).Sum(_ => _.Interest),
                 BankName = x.ClientUser.Bank.Name,
-
             }).ToListAsync();
         }
-
         public async Task<IEnumerable<BankResume>> GetBankResumes(string userId, FilterOfReportVM model)
         {
             var results = Filter(x => x.UserId == userId
             && x.State != State.Reclosing
-            && x.State == State.Active &&
-
-            x.Debs.Where(_ => _.State == model.DebState).Any())
+            && x.State == State.Active
+            && (x.CreateAt >= model.StartDate.ToDateTime() && x.CreateAt <= model.EndDate.ToDateTime())
+            &&  x.Debs.Where(_ => _.State == model.DebState || _.AllowPayInterest).Any())
+                .Include(x => x.Debs)
+                .Include(x => x.HistoryOnlyInterests)
                 .Include(x => x.ClientUser);
 
             if (model.Bank != null)
@@ -658,25 +652,28 @@ namespace BusinesLogic.Services.HiLoans
             var result = await results.AsNoTracking().Select(x =>
              new BankResume
              {
-                 Amount = x.Debs.Where(_ => _.State == model.DebState).Sum(x => x.Interest),
+                 Payments = x.Debs.Where(_ => _.State == model.DebState).Sum(x => x.Interest),
+                 Interest = x.HistoryOnlyInterests.Sum(x => x.Amount),
                  BankName = x.ClientUser.Bank.Name
              }).ToListAsync();
 
-            return result.GroupBy(x => x.BankName, (t, s) => new BankResume
+
+            var total = result.GroupBy(x => x.BankName, (t, s) => new BankResume
             {
-                Amount = s.Select(x => x.Amount).Sum(x => x),
+                Interest = s.Select(x => x.Interest).Sum(x => x),
+                Payments = s.Select(x => x.Payments).Sum(x => x),
                 BankName = t
             });
 
-        }
+            return total;
 
+        }
         public async Task<bool> SetOrDisableIsUpToDate(Guid id)
         {
             var result = await GetById(id);
             result.IsUpToDate = !result.IsUpToDate;
             return await Update(result);
         }
-
         public async Task ToggleAllUpToDate(string userId)
         {
             var results = Filter(x => x.UserId == userId);
@@ -685,7 +682,6 @@ namespace BusinesLogic.Services.HiLoans
             _dbContext.UpdateRange(results);
             await CommitAsync();
         }
-
         public async Task ClearAllUpToDate(string userId)
         {
             var results = Filter(x => x.UserId == userId);
@@ -693,13 +689,27 @@ namespace BusinesLogic.Services.HiLoans
             _dbContext.UpdateRange(results);
             await CommitAsync();
         }
-
         public async Task<ICollection<Loan>> GetAllSoldOut(string userId)
             => await Filter(x => x.ActualCapital <= 0 && x.UserId == userId).Include(x => x.ClientUser.User)
             .Include(x => x.ClientUser).ThenInclude(x => x.Enterprise).ToListAsync();
-
         public async Task<ICollection<Loan>> GetAllRenclosing(string userId)
             => await Filter(x => x.State == State.Reclosing && x.UserId == userId).Include(x => x.ClientUser.User)
             .Include(x => x.ClientUser).ThenInclude(x => x.Enterprise).ToListAsync();
+
+        public async Task AddNoteToDeb(Guid debId, string note)
+        {
+            var deb = await _dbContext.Debs.FirstOrDefaultAsync(x => x.Id == debId);
+            deb.Note = note;
+             _dbContext.Debs.Update(deb);
+            await CommitAsync();
+        }
+
+        public async Task RemoveNoteToDeb(Guid debId)
+        {
+            var deb = await _dbContext.Debs.FirstOrDefaultAsync(x => x.Id == debId);
+            deb.Note = null;
+            _dbContext.Debs.Update(deb);
+            await CommitAsync();
+        }
     }
 }

@@ -44,3 +44,13 @@ const getSoldOutReenclosing = () => {
 const showLoading = () => {
     $('.loading').show();
 };
+
+const postIsUpDate = (id) => {
+    fetch(`/Loan/IsUpToDate?id=${id}`, { method: "POST" }).then((response) => {
+        if (response.status !== 200) {
+            location.reload();
+        }
+    }).catch(() => {
+        location.reload();
+    });
+};

@@ -1,4 +1,5 @@
 ﻿using Commons.Helpers;
+using Models.Models.HiLoans;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -28,6 +29,7 @@ namespace Models.Models.HiAccounting.Debs
         public decimal ExtraMount { get; set; }
         public bool IsExtraMount { get; set; } = false;
         public bool AllowPayInterest { get; set; } = false;
+        public string Note { get; set; }
         public Guid LoanId { get; set; }
         public Loan Loan { get; set; }
 

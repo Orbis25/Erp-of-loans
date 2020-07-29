@@ -20,13 +20,19 @@ namespace Models.ViewModels.HiLoans.Loans
     {
         public string BankName { get; set; }
         public string BankNameNormalize => BankName.Trim() == "Ninguna" ? "N/A" : BankName;
-        public decimal Amount { get; set; }
+        public decimal Interest { get; set; }
+        public decimal Payments { get; set; }
+        public decimal Amount => Interest + Payments;
+
     }
 
     public class ReportOfLootVM
     {
         public string Date { get; set; }
-        public decimal Loot { get; set; }
+
+        public decimal Debs { get; set; }
+        public decimal OnlyInterest { get; set; }
+        public decimal Loot => Debs + OnlyInterest;
         public string BankName { get; set; }
         public string BankNameNormalize => BankName.Trim() == "Ninguna" ? "N/A" : BankName;
         public string CompanyName { get; set; }

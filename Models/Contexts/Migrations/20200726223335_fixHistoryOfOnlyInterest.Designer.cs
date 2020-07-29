@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Models.Contexts;
 
 namespace ERP_SPARTAN.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200726223335_fixHistoryOfOnlyInterest")]
+    partial class fixHistoryOfOnlyInterest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -386,9 +388,6 @@ namespace ERP_SPARTAN.Data.Migrations
                     b.Property<Guid>("LoanId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Share")
                         .HasColumnType("int");
 
@@ -541,7 +540,7 @@ namespace ERP_SPARTAN.Data.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("LoanId")
+                    b.Property<Guid>("DebId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("State")
@@ -552,7 +551,7 @@ namespace ERP_SPARTAN.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LoanId");
+                    b.HasIndex("DebId");
 
                     b.ToTable("HistoryOnlyInterests");
                 });
@@ -839,9 +838,9 @@ namespace ERP_SPARTAN.Data.Migrations
 
             modelBuilder.Entity("Models.Models.HiLoans.HistoryOnlyInterest", b =>
                 {
-                    b.HasOne("Models.Models.HiAccounting.Loan", "Loan")
+                    b.HasOne("Models.Models.HiAccounting.Debs.Deb", "Deb")
                         .WithMany("HistoryOnlyInterests")
-                        .HasForeignKey("LoanId")
+                        .HasForeignKey("DebId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

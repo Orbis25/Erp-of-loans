@@ -553,7 +553,7 @@ const reenganch = (id) => {
     Swal.fire({
         title: "Nuevo Reenganche",
         icon: 'info',
-      
+
         showCancelButton: false,
         showConfirmButton: false,
         confirmButtonColor: '#3085d6',
@@ -638,4 +638,45 @@ const GetHistoryPaymentsLoan = (loanId) => {
 };
 
 
+const OpenNoteOfDeb = (debId, note) => {
+
+    let html = `<textarea class='form-control' placeholder='INGRESA UNA NOTA' id='note'>${note}</textArea>`;
+
+    if (note !== "") {
+        html += `<div class='row mt-4'><div class='col-12'>
+                    <button onclick="removeNoteToDeb('${debId}')" class='btn btn-block btn-danger'>Eliminar nota</button>
+                </div></div>`;
+    }
+    Swal.fire({
+        title: "Nota",
+        html: html
+    }).then(({ value }) => {
+        const text = $('#note').val();
+        if (value) {
+            addNotToDeb(debId, text);
+        }
+    });
+};
+
+const addNotToDeb = (debId, note) => {
+    fetch(`/loan/AddNoteToDeb?debId=${debId}&note=${note}`, { method: "POST" }).then((response) => {
+        if (response.ok) {
+            Swal.fire("Listo").then(() => location.reload());
+        } else {
+            Swal.fire("Error");
+        }
+    });
+};
+
+
+const removeNoteToDeb = (debId) => {
+    console.log(debId);
+    fetch(`/loan/RemoveNoteToDeb?debId=${debId}`, { method: "POST" }).then((response) => {
+        if (response.ok) {
+            Swal.fire("Listo").then(() => location.reload());
+        } else {
+            Swal.fire("Error");
+        }
+    });
+};
 
