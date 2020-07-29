@@ -272,10 +272,10 @@ namespace ERP_SPARTAN.Controllers
         [HttpPost]
         public async Task<IActionResult> IsUpToDate(Guid id)
         {
-            if (id == Guid.Empty) return new NotFoundView();
+            if (id == Guid.Empty) return NotFound();
             var result = await _service.LoanService.SetOrDisableIsUpToDate(id);
-            if (!result) BasicNotification("Intente de nuevo mas tarde", NotificationType.error);
-            return RedirectToAction(nameof(Index));
+            if (!result) return BadRequest();
+            return Ok(result);
         }
 
         [HttpPost]
@@ -305,6 +305,20 @@ namespace ERP_SPARTAN.Controllers
         public async Task<IActionResult> GetAllRenclosing()
          => PartialView("_GetAllRenclosingPartial", await _service.LoanService.GetAllRenclosing(GetUserLoggedId()));
 
+        [HttpPost]
+        public async Task<IActionResult> AddNoteToDeb(Guid debId, string note)
+        {
+            if (debId.IsEmpty()) return BadRequest();
+            await _service.LoanService.AddNoteToDeb(debId, note);
+            return Ok();
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> RemoveNoteToDeb(Guid debId)
+        {
+            if (debId.IsEmpty()) return BadRequest();
+            await _service.LoanService.RemoveNoteToDeb(debId);
+            return Ok();
+        }
     }
 }

@@ -48,6 +48,8 @@ namespace Models.Models.HiAccounting
         public virtual IEnumerable<Deb> Debs { get; set; }
         public virtual IEnumerable<ReclosingHistory> ReclosingHistories { get; set; }
         public virtual IEnumerable<HistoryPaymentsLoan> HistoryPaymentsLoans { get; set; }
+        public virtual IEnumerable<HistoryOnlyInterest> HistoryOnlyInterests { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal AmountDeb { get; set; }
         public bool IsUpToDate { get; set; } = false;
@@ -63,6 +65,8 @@ namespace Models.Models.HiAccounting
         [NotMapped]
         public Guid IdLoanForReclosing { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal TotalOfOnlyPayInterest { get; set; }
     }
 
 }

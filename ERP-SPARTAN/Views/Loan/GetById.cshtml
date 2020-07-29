@@ -120,7 +120,7 @@
 
                                 <button onclick="GetHistoryPaymentsLoan('@Model.Id')" class="btn btn-sm btn-dark">
                                     <i class="fas fa-receipt"></i>
-                                     Historial de pagos
+                                    Historial de pagos
                                 </button>
                             }
                         }
@@ -281,6 +281,10 @@
                                                                     </button>
                                                                 }
                                                             }
+
+                                                            <button class="btn btn-sm btn-dark mt-2" onclick="OpenNoteOfDeb('@item.Id','@item.Note')">
+                                                                <i class="fa fa-pencil-alt"></i>
+                                                            </button>
                                                         }
                                                         else
                                                         {

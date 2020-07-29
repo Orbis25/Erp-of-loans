@@ -95,10 +95,7 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    <form asp-action="IsUpToDate" id="@item.Id">
-                                                        <input type="hidden" name="id" value="@item.Id" />
-                                                        <input type="checkbox" id="@Guid.NewGuid()" onchange="this.form.submit()" asp-for="@item.IsUpToDate" />
-                                                    </form>
+                                                    <input type="checkbox" id="@Guid.NewGuid()" onchange="postIsUpDate('@item.Id')" asp-for="@item.IsUpToDate" />
                                                 </td>
                                                 <td>
                                                     @item.CreatedAtStr
